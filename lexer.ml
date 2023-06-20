@@ -44,8 +44,12 @@ let paren_lex str =
 
 let rec lex_it str acc =
     match paren_lex str with
-    | Some token -> token::acc
-    | None -> match operator_lex str
+    | Some (token, rest) -> lex_it rest (token::acc) 
+    | None -> match operator_lex str with
+              | Some (token, rest) -> lex_it rest (token::acc)
+              | None -> match number_lex str with
+                        | Some (token, rest) -> lex_it rest (token::acc)
+                        | None -> acc
 
 let main_lex str =
-    lex_it str []
+    List.reverse (lex_it str [])
