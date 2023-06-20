@@ -6,6 +6,8 @@ type token =
     | OpenParen
     | ClosedParen
 
+(* lexer interface - lexes to Some (value * rest) *)
+
 let digits = [0;1;2;3;4;5;6;7;8;9]
 
 let digit_strings = List.map string_of_int digits
@@ -25,3 +27,13 @@ let number_lex str =
     match (number_lex_list str []) with
     | ([], s) -> None
     | (ds, s) -> Some ((Number (int_of_string (String.concat "" ds))), s)
+
+let operator_string = ["+", "-", "*", "/"]
+
+let operator_lex str =
+    match (String.sub str 0 1) with
+    | "+" -> Some (Add)
+    | "-" -> Some (Sub)
+    | "*" -> Some (Mul)
+    | "/" -> Some (Div)
+    | _ -> None
