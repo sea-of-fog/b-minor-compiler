@@ -35,3 +35,9 @@ let operator_lex str =
     | "*" -> Some (Mul)
     | "/" -> Some (Div)
     | _ -> None
+
+let paren_lex str =
+    match (String.sub str 0 1) with
+    | "(" -> Some (OpenParen)
+    | ")" -> Some (ClosedParen)
+    | _ -> None
