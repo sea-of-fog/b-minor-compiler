@@ -30,10 +30,10 @@ let number_lex str =
 
 let operator_lex str =
     match (String.sub str 0 1) with
-    | "+" -> Some ((Add), suffix str)
-    | "-" -> Some ((Sub), suffix str)
-    | "*" -> Some ((Mul), suffix str)
-    | "/" -> Some ((Div), suffix str)
+    | "+" -> Some ((Op (Add)), suffix str)
+    | "-" -> Some ((Op (Sub)), suffix str)
+    | "*" -> Some ((Op (Mul)), suffix str)
+    | "/" -> Some ((Op (Div)), suffix str)
     | _ -> None
 
 let paren_lex str =
