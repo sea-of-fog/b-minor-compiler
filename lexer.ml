@@ -30,14 +30,22 @@ let number_lex str =
 
 let operator_lex str =
     match (String.sub str 0 1) with
-    | "+" -> Some (Add)
-    | "-" -> Some (Sub)
-    | "*" -> Some (Mul)
-    | "/" -> Some (Div)
+    | "+" -> Some ((Add), suffix str)
+    | "-" -> Some ((Sub), suffix str)
+    | "*" -> Some ((Mul), suffix str)
+    | "/" -> Some ((Div), suffix str)
     | _ -> None
 
 let paren_lex str =
     match (String.sub str 0 1) with
-    | "(" -> Some (OpenParen)
-    | ")" -> Some (ClosedParen)
+    | "(" -> Some ((OpenParen), suffix str)
+    | ")" -> Some ((ClosedParen), suffix str)
     | _ -> None
+
+let rec lex_it str acc =
+    match paren_lex str with
+    | Some token -> token::acc
+    | None -> match operator_lex str
+
+let main_lex str =
+    lex_it str []
