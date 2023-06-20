@@ -11,4 +11,6 @@ let digit_strings = List.map string_of_int digits
 
 let suffix str = (String.sub str 1 (String.length str - 1))
 
-let digit_lex str = if (List.mem (String.sub str 0 1) digit_strings) then (Some ((String.sub str 0 1) , suffix str) ) else None
+let digit_lex str = if (List.mem (String.sub str 0 1) digit_strings)
+                        then (Some ((String.sub str 0 1) , suffix str) ) 
+                        else None
