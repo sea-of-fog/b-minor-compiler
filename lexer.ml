@@ -26,7 +26,7 @@ let rec number_lex_list str acc =
 let number_lex str =
     match (number_lex_list str []) with
     | ([], s) -> None
-    | (ds, s) -> Some ((Number (int_of_string (String.concat "" ds))), s)
+    | (ds, s) -> Some ((Number (int_of_string (String.concat "" (List.rev ds)))), s)
 
 let operator_lex str =
     match (String.sub str 0 1) with
@@ -52,4 +52,4 @@ let rec lex_it str acc =
                         | None -> acc
 
 let main_lex str =
-    List.reverse (lex_it str [])
+    List.rev (lex_it str [])
