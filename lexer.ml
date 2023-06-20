@@ -28,8 +28,6 @@ let number_lex str =
     | ([], s) -> None
     | (ds, s) -> Some ((Number (int_of_string (String.concat "" ds))), s)
 
-let operator_string = ["+", "-", "*", "/"]
-
 let operator_lex str =
     match (String.sub str 0 1) with
     | "+" -> Some (Add)
