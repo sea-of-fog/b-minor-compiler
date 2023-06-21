@@ -1,4 +1,4 @@
-type op = add | sub | mul | div
+type op = Add | Sub | Mul | Div
 
 type expr =
     | NumberE of int
