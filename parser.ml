@@ -24,9 +24,9 @@ let op_parser ts =
     match expr_parser ts with
     | None -> None
     | Some (exp1, rest) -> match rest with
-                           | (Op op)::rest -> match expr_parser rest with
+                           | (Op oper)::rest -> match expr_parser rest with
                                               | None -> None
-                                              | Some (exp2, rest) -> OpE op exp1 exp2
+                                              | Some (exp2, rest) -> OpE oper, exp1, exp2
                            | _ -> None
 
 
@@ -37,4 +37,4 @@ let rec expr_parser ts =
               | Some (expr, rest) -> (expr, rest)
               | None -> match number_parser with
                         | Some (expr, rest) -> (expr, rest)
-                        | None
+                        | None -> None
