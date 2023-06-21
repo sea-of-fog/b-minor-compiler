@@ -21,11 +21,14 @@ and bracket_parser ts =
     match ts with
     | [] -> None
     | t::rest -> match t with
+                 | ClosedParen -> None
+                 | Number x -> None
+                 | Op o -> None
                  | OpenParen -> match expr_parser rest with
-                 | None -> None
-                 | Some (exp,rest) -> match rest with
-                                      | ClosedParen::rest -> Some (exp, rest)
-                                      | _ -> None
+                                | None -> None
+                                | Some (exp,rest) -> match rest with
+                                                    | ClosedParen::rest -> Some (exp, rest)
+                                                    | _ -> None
                                                 
 
 and op_parser ts =
@@ -46,3 +49,6 @@ and expr_parser ts =
               | None -> match number_parser ts with
                         | Some (expr, rest) -> Some (expr, rest)
                         | None -> None
+
+let parse_string str =
+    expr_parser (main_lex str)
