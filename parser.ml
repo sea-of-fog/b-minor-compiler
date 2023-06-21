@@ -14,10 +14,10 @@ let bracket_parser ts =
     match ts with
     | [] -> None
     | t::rest -> match t with
-                 | OpenBracket -> match expr_parser rest with
+                 | OpenParen -> match expr_parser rest with
                                   | None -> None
                                   | Some exp::rest -> match rest with
-                                                      | ClosedBracket::rest -> Some (exp, rest)
+                                                      | ClosedParen::rest -> Some (exp, rest)
                                                       | _ -> None
 
 let op_parser ts =
