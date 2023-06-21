@@ -1,5 +1,12 @@
 type op = Add | Sub | Mul | Div
 
+(*
+    TODO:
+        1. add error handling
+        2. strip whitespace in the beginning
+        3. structure this better: use sequencing/alternative of parsers
+ *)
+
 type token =
     | Number of int
     | Op of op
