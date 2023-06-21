@@ -22,7 +22,7 @@ let digit_lex str = if (String.length str = 0)
 
 let rec number_lex_list str acc =
     match (digit_lex str) with
-    | None -> ([], str) 
+    | None -> (acc, str) 
     | Some (a, b) -> number_lex_list b (a::acc)
 
 let number_lex str =
