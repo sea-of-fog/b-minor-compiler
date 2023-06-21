@@ -1,7 +1,14 @@
-type op = Add | Sub | Mul | Div
+type operator = AddO | SubO | MulO | DivO
 type expr =
     | NumE of int
-    | OpE of op * expr * expr
+    | OpE of operator * expr * expr
+
+let operator_of_op o =
+    match o with
+    | Add -> AddO
+    | Sub -> SubO
+    | Mul -> MulO
+    | Div -> DivO
 
 let rec number_parser ts =
         match ts with
@@ -27,7 +34,7 @@ and op_parser ts =
         | Some (exp1, rest) -> match rest with
                                | (Op oper)::rest -> match expr_parser rest with
                                                   | None -> None
-                                                  | Some (exp2, rest) -> Some ((OpE oper, exp1, exp2), rest)
+                                                  | Some (exp2, rest) -> let exp = OpE ((operator_of_op oper), exp1, exp2) in Some (exp, rest)
                                | _ -> None
 
 
@@ -35,7 +42,7 @@ and expr_parser ts =
     match bracket_parser ts with
     | Some (expr, rest) -> Some (expr, rest)
     | None -> match op_parser ts with
-              | Some (expr, rest) -> (expr, rest)
-              | None -> match number_parser with
-                        | Some (expr, rest) -> (expr, rest)
+              | Some (expr, rest) -> Some (expr, rest)
+              | None -> match number_parser ts with
+                        | Some (expr, rest) -> Some (expr, rest)
                         | None -> None
