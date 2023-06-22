@@ -1,5 +1,11 @@
 type op = Add | Sub | Mul | Div
 
+type token =
+    | Number of int
+    | Op of op
+    | OpenParen
+    | ClosedParen
+
 type expr =
-    | NumberE of int
+    | NumE of int
     | OpE of op * int * int
