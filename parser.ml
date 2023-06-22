@@ -44,12 +44,12 @@ and expr_prime_parser ts =
                          | None -> None
                          | Some (term, rest) -> match expr_prime_parser rest with
                                                 | None -> None
-                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((Add), e, term))), rest))
+                                                | Some (f, rest) -> Some ((fun e -> f (OpE (Add, e, term))), rest))
     | (Op (Sub))::ts -> (match term_parser ts with
                          | None -> None
                          | Some (term, rest) -> match expr_prime_parser rest with
                                                 | None -> None
-                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((Sub), e, term))), rest))
+                                                | Some (f, rest) -> Some ((fun e -> f (OpE (Sub, e, term))), rest))
     | _ -> Some ((fun s -> s), ts)
 
 and term_parser ts =
@@ -65,12 +65,12 @@ and term_prime_parser ts =
                          | None -> None
                          | Some (atom, rest) -> match term_prime_parser rest with
                                                 | None -> None
-                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((Mul), e, atom))), rest))
+                                                | Some (f, rest) -> Some ((fun e -> f (OpE (Mul, e, atom))), rest))
     | (Op (Div))::ts -> (match atom_parser ts with
                          | None -> None
                          | Some (atom, rest) -> match term_prime_parser rest with
                                                 | None -> None
-                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((Div), e, atom))), rest))
+                                                | Some (f, rest) -> Some ((fun e -> f (OpE (Div, e, atom))), rest))
     | _ -> Some ((fun s -> s), ts)
 
 and atom_parser ts =
