@@ -6,7 +6,7 @@
 let rec eval exp =
     match exp with
     | NumE n -> n
-    | OpE (AddO, e1, e2) -> (eval e1) + (eval e2)
-    | OpE (SubO, e1, e2) -> (eval e1) - (eval e2)
-    | OpE (MulO, e1, e2) -> (eval e1) * (eval e2)
-    | OpE (DivO, e1, e2) -> (eval e1) / (eval e2)
+    | OpE (Add, e1, e2) -> (eval e1) + (eval e2)
+    | OpE (Sub, e1, e2) -> (eval e1) - (eval e2)
+    | OpE (Mul, e1, e2) -> (eval e1) * (eval e2)
+    | OpE (Div, e1, e2) -> (eval e1) / (eval e2)
