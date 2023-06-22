@@ -31,12 +31,6 @@
  *    the parsers for T' and S' will return lambdas waiting for the right term
  *)
 
-type oper = AddO | SubO | MulO | DivO
-
-type expr =
-    | NumE of int
-    | OpE of oper * expr * expr
-
 let rec expr_parser ts =
     match term_parser ts with
     | None -> None
@@ -50,12 +44,12 @@ and expr_prime_parser ts =
                          | None -> None
                          | Some (term, rest) -> match expr_prime_parser rest with
                                                 | None -> None
-                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((AddO), e, term))), rest))
+                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((Add), e, term))), rest))
     | (Op (Sub))::ts -> (match term_parser ts with
                          | None -> None
                          | Some (term, rest) -> match expr_prime_parser rest with
                                                 | None -> None
-                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((SubO), e, term))), rest))
+                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((Sub), e, term))), rest))
     | _ -> Some ((fun s -> s), ts)
 
 and term_parser ts =
@@ -71,12 +65,12 @@ and term_prime_parser ts =
                          | None -> None
                          | Some (atom, rest) -> match term_prime_parser rest with
                                                 | None -> None
-                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((MulO), e, atom))), rest))
+                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((Mul), e, atom))), rest))
     | (Op (Div))::ts -> (match atom_parser ts with
                          | None -> None
                          | Some (atom, rest) -> match term_prime_parser rest with
                                                 | None -> None
-                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((DivO), e, atom))), rest))
+                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((Div), e, atom))), rest))
     | _ -> Some ((fun s -> s), ts)
 
 and atom_parser ts =
