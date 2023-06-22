@@ -1,3 +1,15 @@
+(* version 0 of the parser, based on the CFG:
+ * S -> E
+ * E -> (E)
+ * E -> E op E
+ * op -> + | - | * | /
+ *
+ * this, however does not work, because:
+ * 1) there are left-recursive productions
+ * 2) there is not operator precedence
+ * 3) it parser expressions to right-associativiy 
+ *)
+
 type operator = AddO | SubO | MulO | DivO
 type expr =
     | NumE of int
