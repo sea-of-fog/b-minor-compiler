@@ -8,4 +8,4 @@ type token =
 
 type expr =
     | NumE of int
-    | OpE of op * int * int
+    | OpE of op * expr * expr
