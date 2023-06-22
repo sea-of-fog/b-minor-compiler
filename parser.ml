@@ -83,4 +83,8 @@ and atom_parser ts =
                                               | _ -> None)
     | _ -> None
 
-let parsing_pipeline str = expr_parser (main_lex str)
+(* TODO: report errors! *)
+let parsing_pipeline str =
+    match expr_parser (main_lex str) with
+    | Some (exp, rest) -> exp
+    | None -> NumE 42
