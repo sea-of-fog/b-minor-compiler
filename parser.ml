@@ -37,57 +37,56 @@ type expr =
     | NumE of int
     | OpE of oper * expr * expr
 
-let main_parser ts =
-    let rec expr_parser ts =
-        match term_parser ts with
-        | None -> None
-        | Some (exp, ts) -> match expr_prime_parser ts with
-                            | None -> None
-                            | Some (f, rest)  -> Some (f exp, rest)
+let rec expr_parser ts =
+    match term_parser ts with
+    | None -> None
+    | Some (exp, ts) -> match expr_prime_parser ts with
+                        | None -> None
+                        | Some (f, rest)  -> Some (f exp, rest)
 
-    and expr_prime_parser ts =
-        match ts with
-        | (Op (Add))::ts -> (match term_parser ts with
-                             | None -> None
-                             | Some (term, rest) -> match expr_prime_parser rest with
-                                                    | None -> None
-                                                    | Some (f, rest) -> Some ((fun e -> f (OpE ((AddO), e, term))), rest))
-        | (Op (Sub))::ts -> (match term_parser ts with
-                            | None -> None
-                            | Some (term, rest) -> match expr_prime_parser rest with
-                                                   | None -> None
-                                                   | Some (f, rest) -> Some ((fun e -> f (OpE ((SubO), e, term))), rest))
-        | _ -> Some ((fun s -> s), ts)
+and expr_prime_parser ts =
+    match ts with
+    | (Op (Add))::ts -> (match term_parser ts with
+                         | None -> None
+                         | Some (term, rest) -> match expr_prime_parser rest with
+                                                | None -> None
+                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((AddO), e, term))), rest))
+    | (Op (Sub))::ts -> (match term_parser ts with
+                         | None -> None
+                         | Some (term, rest) -> match expr_prime_parser rest with
+                                                | None -> None
+                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((SubO), e, term))), rest))
+    | _ -> Some ((fun s -> s), ts)
 
-    and term_parser ts =
-        match atom_parser ts with
-        | None -> None
-        | Some (exp, ts) -> match term_prime_parser ts with
-                            | None -> None
-                            | Some (f, rest) -> Some (f exp, rest)
+and term_parser ts =
+    match atom_parser ts with
+    | None -> None
+    | Some (exp, ts) -> match term_prime_parser ts with
+                        | None -> None
+                        | Some (f, rest) -> Some (f exp, rest)
 
-    and term_prime_parser s =
-        match ts with
-        | (Op (Mul))::ts -> (match atom_parser ts with
-                            | None -> None
-                            | Some (atom, rest) -> match term_prime_parser rest with
-                                                   | None -> None
-                                                   | Some (f, rest) -> Some ((fun e -> f (OpE ((MulO), e, atom))), rest))
-        | (Op (Div))::ts -> (match atom_parser ts with
-                            | None -> None
-                            | Some (atom, rest) -> match term_prime_parser rest with
-                                                   | None -> None
-                                                   | Some (f, rest) -> Some ((fun e -> f (OpE ((DivO), e, atom))), rest))
-        | _ -> Some ((fun s -> s), ts)
+and term_prime_parser ts =
+    match ts with
+    | (Op (Mul))::ts -> (match atom_parser ts with
+                         | None -> None
+                         | Some (atom, rest) -> match term_prime_parser rest with
+                                                | None -> None
+                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((MulO), e, atom))), rest))
+    | (Op (Div))::ts -> (match atom_parser ts with
+                         | None -> None
+                         | Some (atom, rest) -> match term_prime_parser rest with
+                                                | None -> None
+                                                | Some (f, rest) -> Some ((fun e -> f (OpE ((DivO), e, atom))), rest))
+    | _ -> Some ((fun s -> s), ts)
 
-    and atom_parser ts =
-        match ts with
-        | (Number n)::ts -> Some ((NumE n), ts)
-        | OpenParen::ts -> (match expr_parser ts with
-                           | None -> None
-                           | Some (exp, rest) -> match rest with
-                                                 | ClosedParen::rest -> Some (exp, rest)
-                                                 | _ -> None)
-        | _ -> None
+and atom_parser ts =
+    match ts with
+    | (Number n)::rest -> Some ((NumE n), rest)
+    | OpenParen::ts -> (match expr_parser ts with
+                        | None -> None
+                        | Some (exp, rest) -> match rest with
+                                              | ClosedParen::rest -> Some (exp, rest)
+                                              | _ -> None)
+    | _ -> None
 
-    in expr_parser ts
+let parsing_pipeline str = expr_parser (main_lex str)
