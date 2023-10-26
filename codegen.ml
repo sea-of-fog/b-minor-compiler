@@ -35,9 +35,9 @@ let rec codegen exp table =
                                 right_res)
     | OpE(Sub, exp1, exp2) -> let left_code, left_table, left_res = codegen exp1 table in
                               let right_code, right_table, right_res = codegen exp2 left_table in
-                              ( ("SUBQ "^left_res^", "^right_res)::(right_code@left_code),
-                                scratch_free left_res right_table,
-                                right_res)
+                              ( ("SUBQ "^right_res^", "^left_res)::(right_code@left_code),
+                                scratch_free right_res right_table,
+                                left_res)
     | OpE(Mul, exp1, exp2) -> let left_code, left_table, left_res = codegen exp1 table in
                               let right_code, right_table, right_res = codegen exp2 left_table in
                               ( ("MOVQ %rax, "^right_res) ::
