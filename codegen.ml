@@ -1,7 +1,7 @@
 module M = Map.Make(String)
 
 let scratch_table =
-    [("%rbx", false); ("%r10", false); ("%r11", false); ("%r12", false); ("%r13", false); ("%r14", false); ("%r15", false)]
+    [("%r10", false); ("%r11", false); ("%r12", false); ("%r13", false); ("%r14", false); ("%r15", false)]
     |> List.to_seq
     |> M.of_seq
 
@@ -55,8 +55,23 @@ let rec output_lines channel lines =
     | line::lines -> let () = O.output_string channel ("\t"^line^"\n")
                      in output_lines channel lines
 
+let pad_code res code =
+    [".data\n";
+     "\tformat: .asciz \"%d\\n\"\n";
+     ".text";
+     "\t.global main\n";
+     "main:\n"]@
+    code@
+    ["\n\tPUSH %rbx\n";
+     "\tLEA  format(%rip), %rdi";
+    ("\tMOV  "^res^", %rsi");
+     "\tXOR  %eax, %eax\n";
+     "\tCALL printf\n";
+     "\tPOP  %rbx\n";
+     "\tRET"]
+
 
 let write_code tgt exp =
-    let code, _, _ = codegen exp scratch_table in
+    let code, _, res = codegen exp scratch_table in
     let channel = O.open_text tgt in
-    output_lines channel (List.rev code)
+    output_lines channel (pad_code res (List.rev code))
