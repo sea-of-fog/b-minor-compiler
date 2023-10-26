@@ -1,4 +1,0 @@
-#use "syntax.ml";;
-#use "lexer.ml";;
-#use "parser.ml";;
-#use "eval.ml";;
