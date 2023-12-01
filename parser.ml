@@ -1,3 +1,5 @@
+open Syntax
+
 (* This version (v1) of the parser is based on the following CFG:
  * S -> E (as in "expression")
  * E -> E + T | E - T | T (as in "term")
@@ -30,6 +32,23 @@
  * 1) since we are building left-associative expressions,
  *    the parsers for T' and S' will return lambdas waiting for the right term
  *)
+
+(* the v2 version will deal with actual programs, not just expressions! *)
+(* a program in v2 is a sequence of instructions. an instruction is a declaration (with let!), *)
+(* an assignment statement or an expression *)
+
+(* The grammar is now: *)
+
+(* S -> I Colon S | varepsilon *)
+(* I -> D | St | E *)
+(* D -> Let Id Equal E *)
+(* St -> Id Equal E | Print E *)
+(* E -> as above *)
+(* E  -> TE' *)
+(* E' -> +TE' | -TE' | \varepsilon *)
+(* T  -> AT' *)
+(* T' -> *AT' | /AT' | \varepsilon *)
+(* A -> Number | Id | (E) *)
 
 let rec expr_parser ts =
     match term_parser ts with
@@ -76,6 +95,7 @@ and term_prime_parser ts =
 and atom_parser ts =
     match ts with
     | (Number n)::rest -> Some ((NumE n), rest)
+    | (Id id)::rest    -> Some ((VarE id), rest)
     | OpenParen::ts -> (match expr_parser ts with
                         | None -> None
                         | Some (exp, rest) -> match rest with
@@ -83,8 +103,42 @@ and atom_parser ts =
                                               | _ -> None)
     | _ -> None
 
-(* TODO: report errors! *)
-let parsing_pipeline str =
-    match expr_parser (main_lex str) with
-    | Some (exp, rest) -> exp
-    | None -> NumE 42
+let decl_parser ts =
+    match ts with
+    | (Keyword Let)::(Id id)::Equal::ts -> begin match expr_parser ts with
+                                           | Some (exp, rest) -> Some(SimpDec(id, exp), rest)
+                                           | None             -> None
+                                           end
+    | _                                 -> None
+
+let stmt_parser ts =
+    match ts with
+    | (Id id)::Equal::ts -> begin match expr_parser ts with
+                            | Some (exp, rest) -> Some (AssS(id, exp), rest)
+                            | None             -> None
+                            end
+    | (Keyword Print)::ts -> begin match expr_parser ts with
+                             | Some (exp, rest) -> Some (PrintS exp, rest)
+                             | None             -> None
+                             end
+                             
+
+
+let instruction_parser ts =
+    match decl_parser ts with
+    | Some(decl, rest) -> Some ((Decl decl), rest)
+    | None -> match stmt_parser ts with
+              | Some(stmt, rest) -> Some ((Stmt stmt), rest)
+              | None -> match expr_parser ts with
+                        | Some(exp, rest) -> Some (Expr exp, rest)
+                        | None -> None
+
+let rec program_parser_list ts acc =
+    match instruction_parser ts with
+    | None -> acc
+    | Some(instr, rest) -> match rest with
+                           | Colon::rest -> program_parser_list rest (instr::acc)
+                           | _ -> acc
+
+let program_parser ts =
+    List.rev (program_parser_list ts [])
