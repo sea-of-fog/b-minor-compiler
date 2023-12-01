@@ -1,8 +1,16 @@
-type op = Add | Sub | Mul | Div
+type op = 
+    | Add 
+    | Sub 
+    | Mul 
+    | Div
+    | Or
+    | And
 
 type keyword =
     | Let
     | Print
+    | True
+    | False
 
 type token =
     | Keyword of keyword
@@ -18,6 +26,8 @@ type expr =
     | NumE of int
     | OpE  of op * expr * expr
     | VarE of string
+    | TrueE
+    | FalseE
 
 type decl =
     | SimpDec of string * expr

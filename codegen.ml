@@ -35,6 +35,14 @@ let rec expr_codegen exp table =
                  in ( ("MOVQ $"^(Printf.sprintf "%d" n)^", "^free)::[],
                      new_table,
                      free)
+    | TrueE -> let free, new_table = scratch_alloc table
+                 in ( ("MOVQ $(-1), "^free)::[],
+                     new_table,
+                     free)
+    | FalseE -> let free, new_table = scratch_alloc table
+                 in ( ("MOVQ $0, "^free)::[],
+                     new_table,
+                     free)
     | OpE(Add, exp1, exp2) -> let left_code, left_table, left_res = expr_codegen exp1 table in
                               let right_code, right_table, right_res = expr_codegen exp2 left_table in
                               ( ("ADDQ "^left_res^", "^right_res)::(right_code@left_code),
