@@ -5,19 +5,20 @@
 
 ## Todo
 1. [X] Generate code for print
-2. [ ] Booleans
+2. [X] Booleans
 3. [ ] Division operator
-4. [ ] If/else
-5. [ ] Boolean operators
-6. [ ] Uninitialized declarations
-7. [ ] Check for initialized declarations
-8. [ ] Typechecking/type inference
-9. [ ] Loops
-10. [ ] Arrays
-11. [ ] Parsing whitespace
-12. [ ] Functions
-13. [ ] Constant folding/propagation
-14. [ ] Refactor lexing and parsing
+4. [ ] Boolean operators
+5. [ ] Add types to declarations
+6. [ ] If/else
+7. [ ] Uninitialized declarations
+8. [ ] Check for initialized declarations
+9. [ ] Typechecking/type inference
+10. [ ] Loops
+11. [ ] Arrays
+12. [ ] Parsing whitespace
+13. [ ] Functions
+14. [ ] Constant folding/propagation
+15. [ ] Refactor lexing and parsing
 
 ## Optional features
 1. [ ] loop breaks

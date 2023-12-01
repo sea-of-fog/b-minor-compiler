@@ -55,7 +55,11 @@ let keyword_lex str =
     then Some (Keyword Let, suffix_from 3 str)
     else if (String.starts_with "print" str)
          then Some (Keyword Print, suffix_from 5 str)
-         else None
+         else if (String.starts_with "true" str)
+              then Some (Keyword True, suffix_from 4 str)
+              else if (String.starts_with "false" str)
+                   then Some (Keyword False, suffix_from 5 str)
+                   else None
 
 let operator_lex str =
     if (String.length str = 0)
@@ -65,7 +69,13 @@ let operator_lex str =
          | "-" -> Some ((Op (Sub)), suffix str)
          | "*" -> Some ((Op (Mul)), suffix str)
          | "/" -> Some ((Op (Div)), suffix str)
-         | _ -> None
+         | _   -> if (String.length str < 2)
+                  then None
+                  else begin match (String.sub str 0 2) with
+                       | "&&" -> Some ((Op And), suffix_from 2 str)
+                       | "||" -> Some ((Op Or), suffix_from 2 str)
+                       | _    -> None
+                       end
 
 let paren_lex str =
     if (String.length str = 0)

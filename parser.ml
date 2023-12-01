@@ -43,14 +43,51 @@ open Syntax
 (* I -> D | St | E *)
 (* D -> Let Id Equal E *)
 (* St -> Id Equal E | Print E *)
-(* E -> as above *)
-(* E  -> TE' *)
+(* OrE -> AndE OrE'*)
+(* OrE' -> Or AndE OrE' | \varepsilon *)
+(* AndE -> E AndE' *)
+(* AndE' -> And E AndE' | \varepsilon *)
+(* E -> TE' *)
 (* E' -> +TE' | -TE' | \varepsilon *)
 (* T  -> AT' *)
 (* T' -> *AT' | /AT' | \varepsilon *)
-(* A -> Number | Id | (E) *)
+(* A -> Number | Id | True | False | (E) *)
 
-let rec expr_parser ts =
+let rec or_parser ts =
+    match and_parser ts with
+    | None -> None
+    | Some (exp, ts) -> match or_prime_parser ts with
+                        | None         -> None
+                        | Some (f, ts) -> Some (f exp, ts)
+
+and or_prime_parser ts =
+    match ts with
+    | (Op Or)::ts -> begin match and_parser ts with
+                     | Some (exp, ts) -> begin match or_prime_parser ts with
+                                         | None -> None
+                                         | Some (f, ts) -> Some ((fun e -> f (OpE (Or, e, exp))), ts)
+                                         end
+                     end
+    | _           -> Some ((fun s -> s), ts) 
+
+and and_parser ts =
+    match expr_parser ts with
+    | None -> None
+    | Some (exp, ts) -> match and_prime_parser ts with
+                        | None         -> None
+                        | Some (f, ts) -> Some (f exp, ts)
+
+and and_prime_parser ts =
+    match ts with
+    | (Op And)::ts -> begin match expr_parser ts with
+                      | Some (exp, ts) -> begin match and_prime_parser ts with
+                                         | None -> None
+                                         | Some (f, ts) -> Some ((fun e -> f (OpE (And, e, exp))), ts)
+                                         end
+                     end
+    | _           -> Some ((fun s -> s), ts) 
+
+and expr_parser ts =
     match term_parser ts with
     | None -> None
     | Some (exp, ts) -> match expr_prime_parser ts with
@@ -96,6 +133,8 @@ and atom_parser ts =
     match ts with
     | (Number n)::rest -> Some ((NumE n), rest)
     | (Id id)::rest    -> Some ((VarE id), rest)
+    | (Keyword True)::rest -> Some (TrueE, rest)
+    | (Keyword False)::rest -> Some (FalseE, rest)
     | OpenParen::ts -> (match expr_parser ts with
                         | None -> None
                         | Some (exp, rest) -> match rest with
