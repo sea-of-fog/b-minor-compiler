@@ -59,15 +59,22 @@ let stmt_codegen stmt =
     | AssS(id, exp) -> let (exp_code, _, res_register) = expr_codegen exp scratch_table in
         let new_code = "MOVQ ["^id^"], "^res_register in
             exp_code@[new_code]
-    | PrintS(exp)   -> (exp_code, _, res_register) = expr_codegen exp scratch_table in
-        let new_code = failwith "TODO" in
-            exp_code@[new_code]
+    | PrintS(exp)   -> let (exp_code, _, res_register) = expr_codegen exp scratch_table in
+                            let new_code = ["MOVQ  $format, %rdi"; 
+                                            "MOVQ  "^res_register^" , %rsi"; 
+                                            "MOVQ  $0";
+                                            "PUSHQ %r10";
+                                            "PUSHQ %r11";
+                                            "CALL  printf";
+                                            "POPQ  %r11";
+                                            "POPQ  %r10"] in
+                                exp_code@new_code
 
 let decl_codegen decl =
     match decl with
     | SimpDec(id, exp) -> let (exp_code, _, res_register) = expr_codegen exp scratch_table in
                             let new_code = "MOVQ ["^id^"], "^res_register in
-                                exp_code@[new_code]
+                                exp_code@(new_code::[])
 
 let instruction_codegen instr =
     match instr with
@@ -101,4 +108,4 @@ let program_codegen prog =
                     |> List.map extract_var_name
     in let program_code = program_codegen_helper prog []
     in let decl_code = make_declarations var_names in
-        ".data\n"::"\tformat: .asciz \"%d\\n\"\n"::(decl_code@[".text\n"; "\t.global main\n"; "main: \n"]@program_code)
+        ".data\n"::"\tformat: .asciz \"%d\\n\"\n"::(decl_code@[".text\n"; "\t.global main\n"; "main: \n"]@program_code@["RET"])

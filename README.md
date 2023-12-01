@@ -4,7 +4,7 @@
 1. Declarations use let - that's easier to parse
 
 ## Todo
-1. [ ] Generate code for print
+1. [X] Generate code for print
 2. [ ] Booleans
 3. [ ] Division operator
 4. [ ] If/else
