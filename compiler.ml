@@ -7,8 +7,6 @@ let rec output_lines channel lines =
     | line::lines -> let () = O.output_string channel ("\t"^line^"\n")
                      in output_lines channel lines
 
-module O = Out_channel
-
 let read_whole_file filename =
     let ch = open_in_bin filename in
         let s = really_input_string ch (in_channel_length ch) in
@@ -25,5 +23,5 @@ let () = if Analyser.check_if_declared prog
 
 let target_code = Codegen.program_codegen prog
 
-let () = let channel = O.open_text target_file in 
+let () = let channel = Out_channel.open_text target_file in 
             output_lines channel target_code
