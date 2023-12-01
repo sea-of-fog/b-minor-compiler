@@ -102,32 +102,3 @@ let program_codegen prog =
     in let program_code = program_codegen_helper prog []
     in let decl_code = make_declarations var_names in
         ".data\n"::"\tformat: .asciz \"%d\\n\"\n"::(decl_code@[".text\n"; "\t.global main\n"; "main: \n"]@program_code)
-
-
-module O = Out_channel
-
-let rec output_lines channel lines =
-    match lines with
-    | [] -> ()
-    | line::lines -> let () = O.output_string channel ("\t"^line^"\n")
-                     in output_lines channel lines
-
-(* let pad_code code = *)
-(*     [".data\n"; *)
-(*      "\tformat: .asciz \"%d\\n\"\n"; *)
-(*      ".text\n"; *)
-(*      "\t.global main\n"; *) (*      "main:\n"]@ *)
-(*     code@ *)
-(*     ["\n\tPUSH %rbx\n"; *)
-(*      "\tLEA  format(%rip), %rdi"; *)
-(*     ("\tMOV  "^res^", %rsi"); *)
-(*      "\tXOR  %eax, %eax\n"; *)
-(*      "\tCALL printf\n"; *)
-(*      "\tPOP  %rbx\n"; *)
-(*      "\tRET"] *)
-
-
-let write_code tgt prog =
-    let code = program_codegen prog in
-        let channel = O.open_text tgt in
-            output_lines channel code
