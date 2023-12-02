@@ -8,22 +8,22 @@
 1. [X] Generate code for print
 2. [X] Booleans
 3. [ ] Division operator in codegen
-5. [ ] Boolean operators in codegen
-6. [ ] Add interfaces to modules
-7. [ ] Typechecking/type inference
-8. [ ] Print booleans
-9. [ ] Parsing whitespace
-10. [ ] Testing infrastructure
-11. [X] Add types to declarations
-12. [ ] If/else
-13. [ ] Uninitialised declarations
-14. [ ] Check for initialised declarations
-15. [ ] Loops
-16. [ ] Arrays
-17. [ ] Functions
-18. [ ] Constant folding/propagation
-19. [ ] Refactor lexing and parsing
-20. [ ] Generate useful errors from initialization/declaration check
+4. [ ] Boolean operators in codegen
+5. [ ] Add interfaces to modules
+6. [ ] Typechecking/type inference
+7. [ ] Print booleans
+8. [ ] Parsing whitespace
+9. [ ] Testing infrastructure
+10. [X] Add types to declarations
+11. [ ] If/else
+12. [ ] Uninitialised declarations
+13. [ ] Check for initialised declarations
+14. [ ] Loops
+15. [ ] Arrays
+16. [ ] Functions
+17. [ ] Constant folding/propagation
+18. [ ] Refactor lexing and parsing
+19. [ ] Generate useful errors from initialization/declaration check
 
 ## Optional features
 1. [ ] loop breaks
