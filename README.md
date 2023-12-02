@@ -10,7 +10,7 @@
 3. [ ] Division operator in codegen
 4. [ ] Boolean operators in codegen
 5. [X] Add interfaces to modules
-6. [ ] Typechecking/type inference
+6. [X] Typechecking/type inference
 7. [ ] Print booleans
 8. [ ] Parsing whitespace
 9. [ ] Testing infrastructure
@@ -24,6 +24,7 @@
 17. [ ] Constant folding/propagation
 18. [ ] Refactor lexing and parsing
 19. [ ] Generate useful errors from initialization/declaration check
+20. [ ] Make typechecker monadic
 
 ## Optional features
 1. [ ] loop breaks
