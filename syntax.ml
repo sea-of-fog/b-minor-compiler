@@ -11,6 +11,8 @@ type keyword =
     | Print
     | True
     | False
+    | Int
+    | Bool
 
 type token =
     | Keyword of keyword
@@ -19,8 +21,13 @@ type token =
     | Op of op
     | OpenParen
     | ClosedParen
+    | SemiColon
     | Colon
     | Equal
+
+type typ =
+    | IntT
+    | BoolT
 
 type expr =
     | NumE of int
@@ -30,7 +37,7 @@ type expr =
     | FalseE
 
 type decl =
-    | SimpDec of string * expr
+    | SimpDec of string * typ * expr
 
 type stmt =
     | AssS of string * expr
