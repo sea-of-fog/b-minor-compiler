@@ -7,21 +7,23 @@
 ## Todo
 1. [X] Generate code for print
 2. [X] Booleans
-3. [ ] Print booleans
-4. [ ] Division operator
-5. [ ] Boolean operators
-6. [X] Add types to declarations
-7. [ ] If/else
-8. [ ] Uninitialized declarations
-9. [ ] Check for initialized declarations
-10. [ ] Typechecking/type inference
-11. [ ] Loops
-12. [ ] Arrays
-13. [ ] Parsing whitespace
-14. [ ] Functions
-15. [ ] Constant folding/propagation
-16. [ ] Refactor lexing and parsing
-17. [ ] Generate useful errors from initialization/declaration check
+3. [ ] Division operator in codegen
+5. [ ] Boolean operators in codegen
+6. [ ] Add interfaces to modules
+7. [ ] Typechecking/type inference
+8. [ ] Print booleans
+9. [ ] Parsing whitespace
+10. [ ] Testing infrastructure
+11. [X] Add types to declarations
+12. [ ] If/else
+13. [ ] Uninitialised declarations
+14. [ ] Check for initialised declarations
+15. [ ] Loops
+16. [ ] Arrays
+17. [ ] Functions
+18. [ ] Constant folding/propagation
+19. [ ] Refactor lexing and parsing
+20. [ ] Generate useful errors from initialization/declaration check
 
 ## Optional features
 1. [ ] loop breaks
