@@ -35,11 +35,9 @@ and infer_type exp env : Syntax.typ option =
 
 let check_decl decl env =
     match decl with
-    | SimpDec(id, typ, exp) -> match infer_type exp env with
-                               | None   -> (false, add_env id typ env)
-                               | Some t -> if t = typ
-                                           then (true, add_env id typ env)
-                                           else (false, add_env id typ env)
+    | SimpDec(id, typ, exp) -> if check_type exp env typ
+                               then (true, add_env id typ env)
+                               else (false, add_env id typ env)
 
 let check_stmt stmt env =
     match stmt with
