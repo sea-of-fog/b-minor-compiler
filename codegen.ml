@@ -105,7 +105,7 @@ let extract_var_name instr =
     match instr with
     | Decl(SimpDec(id, typ, exp)) -> id
 
-(* integers initialized as 42 *)
+(* integers initialized as 0 *)
 let make_declarations (var_names : string list) : string list =
     (List.map (fun id -> id^": .quad 0") var_names)
     
@@ -116,4 +116,10 @@ let program_codegen prog =
                     |> List.map extract_var_name
     in let program_code = program_codegen_helper prog []
     in let decl_code = make_declarations var_names in
-        ".data\n"::"\tformat: .asciz \"%d\\n\"\n"::(decl_code@[".text\n"; "\t.global main\n"; "main: \n"]@program_code@["RET"])
+        [".data\n";
+         "\tformat: .asciz \"%d\\n\"\n"]@
+        decl_code@
+        [".text\n";
+        "\t.global main\n"; "main: \n"]@
+        program_code@
+        ["RET"]
