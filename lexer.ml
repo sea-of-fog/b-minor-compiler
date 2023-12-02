@@ -59,7 +59,11 @@ let keyword_lex str =
               then Some (Keyword True, suffix_from 4 str)
               else if (String.starts_with "false" str)
                    then Some (Keyword False, suffix_from 5 str)
-                   else None
+                   else if (String.starts_with "int" str)
+                       then Some (Keyword Int, suffix_from 5 str)
+                       else if (String.starts_with "bool" str)
+                            then Some (Keyword Bool, suffix_from 5 str)
+                            else None
 
 let operator_lex str =
     if (String.length str = 0)
@@ -83,7 +87,8 @@ let paren_lex str =
     else match (String.sub str 0 1) with
         | "(" -> Some ((OpenParen), suffix str)
         | ")" -> Some ((ClosedParen), suffix str)
-        | ";" -> Some ((Colon), suffix str)
+        | ";" -> Some ((SemiColon), suffix str)
+        | ":" -> Some ((Colon), suffix str)
         | "=" -> Some ((Equal), suffix str)
         | _ -> None
 

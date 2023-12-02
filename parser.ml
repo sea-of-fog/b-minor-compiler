@@ -41,7 +41,7 @@ open Syntax
 
 (* S -> I Colon S | varepsilon *)
 (* I -> D | St | E *)
-(* D -> Let Id Equal E *)
+(* D -> Let Id Colon Typ Equal E *)
 (* St -> Id Equal E | Print E *)
 (* OrE -> AndE OrE'*)
 (* OrE' -> Or AndE OrE' | \varepsilon *)
@@ -144,11 +144,15 @@ and atom_parser ts =
 
 let decl_parser ts =
     match ts with
-    | (Keyword Let)::(Id id)::Equal::ts -> begin match expr_parser ts with
-                                           | Some (exp, rest) -> Some(SimpDec(id, exp), rest)
-                                           | None             -> None
-                                           end
-    | _                                 -> None
+    | (Keyword Let)::(Id id)::(Colon)::(Keyword Int)::Equal::ts -> begin match expr_parser ts with
+                                                                   | Some (exp, rest) -> Some(SimpDec(id, IntT, exp), rest)
+                                                                   | None             -> None
+                                                                   end
+    | (Keyword Let)::(Id id)::(Colon)::(Keyword Bool)::Equal::ts -> begin match expr_parser ts with
+                                                                   | Some (exp, rest) -> Some(SimpDec(id, BoolT, exp), rest)
+                                                                   | None             -> None
+                                                                   end
+    | _ -> None
 
 let stmt_parser ts =
     match ts with
@@ -176,7 +180,7 @@ let rec program_parser_list ts acc =
     match instruction_parser ts with
     | None -> acc
     | Some(instr, rest) -> match rest with
-                           | Colon::rest -> program_parser_list rest (instr::acc)
+                           | SemiColon::rest -> program_parser_list rest (instr::acc)
                            | _ -> acc
 
 let program_parser ts =
