@@ -19,7 +19,11 @@ let prog = Parser.program_parser ts
 
 let () = if Analyser.check_if_declared prog
          then ()
-         else print_endline "There are undeclared variables"
+         else print_endline "There are undeclared variables"; exit 0
+
+let () = if Type.check prog
+         then ()
+         else print_endline "Type error"; exit 0
 
 let target_code = Codegen.program_codegen prog
 
