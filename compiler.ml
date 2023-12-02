@@ -4,7 +4,7 @@ let target_file = Sys.argv.(2)
 let rec output_lines channel lines =
     match lines with
     | [] -> ()
-    | line::lines -> let () = O.output_string channel ("\t"^line^"\n")
+    | line::lines -> let () = Out_channel.output_string channel ("\t"^line^"\n")
                      in output_lines channel lines
 
 let read_whole_file filename =
