@@ -8,6 +8,9 @@ ocamlc -c lexer.ml
 ocamlc -c parser.mli
 ocamlc -c parser.ml
 
+ocamlc -c type.mli
+ocamlc -c type.ml
+
 ocamlc -c analyser.mli
 ocamlc -c analyser.ml
 
