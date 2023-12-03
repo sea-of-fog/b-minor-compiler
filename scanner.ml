@@ -90,8 +90,8 @@ let paren_lex str =
         | _ -> None
 
 let rec lex_it str acc =
-    if str == "" then acc
-    else if List.mem str.[0] [' '; '\t'; '\n'; '\r']
+    if str = "" then acc
+    else if List.mem (str.[0]) [' '; '\t'; '\n'; '\r']
     then lex_it (suffix str) acc
     else      match id_lex str with
               | Some (token, rest) -> lex_it rest (token::acc)
