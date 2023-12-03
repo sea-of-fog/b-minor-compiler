@@ -14,7 +14,7 @@ let read_whole_file filename =
 
 let source_code = read_whole_file source_file
 
-let ts = Lexer.main_lex source_code
+let ts = Scanner.main_lex source_code
 let prog = Parser.program_parser ts
 
 let () = if Analyser.check_if_declared prog
