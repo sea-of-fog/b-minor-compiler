@@ -2,8 +2,8 @@
 
 ocamlc -c syntax.ml
 
-ocamlc -c scanner.ml
 ocamlc -c scanner.mli
+ocamlc -c scanner.ml
 
 ocamlc -c parser.mli
 ocamlc -c parser.ml
@@ -18,3 +18,4 @@ ocamlc -c codegen.mli
 ocamlc -c codegen.ml
 
 ocamlc syntax.cmo scanner.cmo parser.cmo type.cmo analyser.cmo codegen.cmo compiler.ml -o bmc
+chmod +x bmc
