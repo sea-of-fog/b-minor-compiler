@@ -1,5 +1,5 @@
 let source_file = Sys.argv.(1)
-let target_file = Sys.argv.(2)
+let output_file = Sys.argv.(2)
 
 let rec output_lines channel lines =
     match lines with
@@ -25,7 +25,7 @@ let () = if Type.check prog
          then ()
          else print_endline "Type error"; exit 0
 
-let target_code = Codegen.program_codegen prog
+let target_code = X86Codegen.program_codegen prog
 
-let () = let channel = Out_channel.open_text target_file in 
+let () = let channel = Out_channel.open_text output_file in 
             output_lines channel target_code
