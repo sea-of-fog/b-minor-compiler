@@ -39,7 +39,7 @@ open Syntax
 
 (* The grammar is now: *)
 
-(* S -> I Colon S | varepsilon *)
+(* S -> I SemiColon S | varepsilon *)
 (* I -> D | St | E *)
 (* D -> Let Id Colon Typ Equal E *)
 (* St -> Id Equal E | Print E *)
@@ -169,19 +169,22 @@ let stmt_parser ts =
 
 let instruction_parser ts =
     match decl_parser ts with
-    | Some(decl, rest) -> Some ((Decl decl), rest)
+    | Some(decl, SemiColon::rest) -> Some ((Decl decl), rest)
+    | Some(decl, rest)            -> failwith "expected ;"
     | None -> match stmt_parser ts with
-              | Some(stmt, rest) -> Some ((Stmt stmt), rest)
+              | Some(stmt, SemiColon::rest) -> Some ((Stmt stmt), rest)
+              | Some(stmt, rest) -> failwith "expected ;"
               | None -> match expr_parser ts with
-                        | Some(exp, rest) -> Some (Expr exp, rest)
+                        | Some(exp, SemiColon::rest) -> Some (Expr exp, rest)
+                        | Some(exp, rest)            -> failwith "expected ;"
                         | None -> None
 
 let rec program_parser_list ts acc =
     match instruction_parser ts with
     | None -> acc
     | Some(instr, rest) -> match rest with
-                           | SemiColon::rest -> program_parser_list rest (instr::acc)
-                           | _ -> acc
+                           | []   -> rest::acc
+                           | _    -> program_parser_list rest (instr::acc)
 
 let program_parser ts =
     List.rev (program_parser_list ts [])
