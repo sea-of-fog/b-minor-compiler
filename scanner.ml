@@ -39,12 +39,12 @@ let id_lex str =
     | (ls, s) -> begin match String.concat "" (List.rev ls) with
                  | "let"    -> Some (Keyword Let, s)
                  | "print"  -> Some (Keyword Print, s)
-                 | "return" -> Some (Keyword Return, s)
                  | "true"   -> Some (Keyword True, s)
                  | "false"  -> Some (Keyword False, s)
                  | "int"    -> Some (Keyword Int, s)
-                 | "Bool"   -> Some (Keyword Bool, s)
+                 | "bool"   -> Some (Keyword Bool, s)
                  | id       -> Some (Id id, s)
+                 end
 
 let digit_lex str = if (String.length str = 0)
                         then None
