@@ -1,4 +1,6 @@
 # ocaml object files
 *.cmo
 *.cmi
+# compilation results
 *.out
+bmc
