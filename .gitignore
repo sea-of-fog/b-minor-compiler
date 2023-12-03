@@ -1,3 +1,4 @@
 # ocaml object files
 *.cmo
 *.cmi
+*.out

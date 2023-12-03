@@ -6,6 +6,8 @@ let lookup decl x =
 let rec check_expr exp declared =
     match exp with
     | NumE _              -> true
+    | TrueE               -> true
+    | FalseE              -> true
     | VarE s              -> lookup declared s
     | OpE(op, exp1, exp2) -> (check_expr exp1 declared) && (check_expr exp2 declared)
 
