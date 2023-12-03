@@ -1,8 +1,10 @@
 # B-minor compiler
 
 ## Changes to the language
-1. Declarations use let - that's easier to parse
-2. Booleans are encoded as $0 or $(-1)
+1. The compiler is named *bmc*
+2. The extension for B- files is *.bm*
+3. Declarations use let - that's easier to parse
+4. Booleans are encoded as $0 or $(-1)
 
 ## Todo
 1. [X] Generate code for print
@@ -20,11 +22,12 @@
 13. [ ] Check for initialised declarations
 14. [ ] Loops
 15. [ ] Arrays
-16. [ ] Functions
-17. [ ] Constant folding/propagation
-18. [ ] Refactor lexing and parsing
-19. [ ] Generate useful errors from initialization/declaration check
-20. [ ] Make typechecker monadic
+16. [ ] Function primitives
+17. [ ] Function declarations
+18. [ ] Constant folding/propagation
+19. [ ] Refactor lexing and parsing
+20. [ ] Generate useful errors from initialization/declaration check
+21. [ ] Make typechecker monadic
 
 ## Optional features
 1. [ ] loop breaks
