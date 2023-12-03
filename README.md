@@ -14,7 +14,7 @@
 5. [X] Add interfaces to modules
 6. [X] Typechecking/type inference
 7. [ ] Print booleans
-8. [ ] Parsing whitespace
+8. [X] Parsing whitespace
 9. [ ] Testing infrastructure
 10. [X] Add types to declarations
 11. [ ] If/else
