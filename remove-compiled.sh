@@ -2,3 +2,4 @@
 
 rm *.cm*
 rm *.out
+rm bmc
