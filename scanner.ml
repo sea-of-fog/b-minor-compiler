@@ -3,7 +3,6 @@ open Syntax
 (*
     TODO:
         1. add error handling
-        2. strip whitespace in the beginning
         3. structure this better: use sequencing/alternative of parsers
  *)
 
