@@ -34,6 +34,7 @@
 
 ## Optional features
 1. [ ] loop breaks
+2. [ ] function inlining
 
 ## Things to test
 1. [ ] Am I allocating registers correctly? Should they not be freed?
