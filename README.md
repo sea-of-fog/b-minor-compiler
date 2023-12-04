@@ -15,21 +15,22 @@
 6. [X] Typechecking/type inference
 7. [ ] Print booleans
 8. [X] Parsing whitespace
-9. [ ] Add unit tests
-10. [ ] Testing infrastructure
-11. [ ] Fix bug in the compiler app
-12. [X] Add types to declarations
-13. [ ] If/else
-14. [ ] Uninitialised declarations
-15. [ ] Check for initialised declarations
-16. [ ] Loops
-17. [ ] Arrays
-18. [ ] Function primitives
-19. [ ] Function declarations
-20. [ ] Constant folding/propagation
-21. [ ] Refactor lexing and parsing
-22. [ ] Generate useful errors from initialization/declaration check
-23. [ ] Make typechecker monadic
+9. [ ] Postfix operators
+10. [ ] Add unit tests
+11. [ ] Testing infrastructure
+12. [ ] Fix bug in the compiler app
+13. [X] Add types to declarations
+14. [ ] If/else
+15. [ ] Uninitialised declarations
+16. [ ] Check for initialised declarations
+17. [ ] Loops
+18. [ ] Arrays
+19. [ ] Function primitives
+20. [ ] Function declarations
+21. [ ] Constant folding/propagation
+22. [ ] Refactor lexing and parsing
+23. [ ] Generate useful errors from initialization/declaration check
+24. [ ] Make typechecker monadic
 
 ## Optional features
 1. [ ] loop breaks
