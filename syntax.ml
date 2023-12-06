@@ -41,7 +41,7 @@ type decl =
 
 type stmt =
     | AssS of string * expr
-    | PrintS of expr
+    | PrintS of expr * (typ option)
 
 type instr =
     | Expr of expr

@@ -1,6 +1,8 @@
 open Syntax
 
-let lookup (id : string) (env : (string * Syntax.typ) list) : Syntax.typ option =
+type env = (string * Syntax.typ) list
+
+let lookup (id : string) (env : env) : Syntax.typ option =
     List.assoc_opt id env
 
 let empty_env = []
@@ -36,45 +38,58 @@ and infer_type exp env : Syntax.typ option =
                                                     else None
 
 
-let check_decl decl env =
+let check_decl decl env : ((Syntax.decl * env) option) =
     match decl with
     | SimpDec(id, typ, exp) -> if check_type exp env typ
-                               then (true, add_env id typ env)
-                               else (false, add_env id typ env)
+                               then Some (decl, add_env id typ env)
+                               else None
 
-let check_stmt stmt env =
+let check_stmt stmt env : (Syntax.stmt option) =
     match stmt with
     | AssS(id, exp) -> begin match infer_type exp env with
-                       | None          -> false
+                       | None          -> None
                        | Some exp_type -> begin match lookup id env with
-                                          | None         -> false
+                                          | None         -> None
                                           | Some id_type -> if exp_type = id_type
-                                                            then true
-                                                            else false
+                                                            then Some stmt
+                                                            else None
                                           end
                        end
-    (* for now - only int statements! *)
-    | PrintS exp    -> let exp_type = infer_type exp env in
-                           if exp_type = Some (Syntax.IntT)
-                           then true
-                           else false
+    | PrintS(exp, _) -> begin match infer_type exp env with
+                        | Some IntT  -> Some (PrintS(exp, Some IntT))
+                        | Some BoolT -> Some (PrintS(exp, Some BoolT))
+                        (* not printable *)
+                        | _          -> None
+                        end
                     
 
-let check_instr instr env =
+let check_instr instr env : (Syntax.instr * env) option =
     match instr with
     | Expr expr -> begin match infer_type expr env with
-                   | Some t -> (true, env)
-                   | None   -> (false, env)
+                   | Some t -> Some (Expr expr, env)
+                   | None   -> None
                    end
-    | Stmt stmt -> (check_stmt stmt env, env)
-    | Decl decl -> check_decl decl env
+    | Stmt stmt -> begin match check_stmt stmt env with
+                   | Some stmt -> Some (Stmt stmt, env)
+                   | None      -> None
+                   end
+    | Decl decl -> begin match check_decl decl env with
+                   | Some (decl, env) -> Some ((Decl decl), env)
+                   | None             -> None
+                   end
 
 let rec helper prog env =
     match prog with
-    | []          -> true
-    | instr::prog -> match check_instr instr env with
-                     | (true,  env)  -> helper prog env
-                     | (false, env)  -> false
+    | []          -> Some []
+    | instr::prog -> begin match check_instr instr env with
+                     | Some (instr, env) -> 
+                         begin match helper prog env with
+                         | None      -> None
+                         | Some prog -> Some (instr::prog)
+                         end
+                     | None -> 
+                         None
+                     end
 
 let check prog =
     helper prog empty_env

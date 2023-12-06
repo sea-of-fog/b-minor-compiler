@@ -163,7 +163,7 @@ let stmt_parser ts =
         end
     | (Keyword Print)::ts -> 
         begin match expr_parser ts with
-        | Some (exp, rest) -> Some (PrintS exp, rest)
+        | Some (exp, rest) -> Some (PrintS(exp, None), rest)
         | None             -> None
         end
     | _ -> 

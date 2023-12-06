@@ -1,1 +1,1 @@
-val check : Syntax.prog -> bool
+val check : Syntax.prog -> Syntax.prog option
