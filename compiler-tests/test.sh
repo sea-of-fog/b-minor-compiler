@@ -22,7 +22,7 @@ do
 		echo "test $i correct"
 	else 
 		echo "test $i incorrect"
-		exit
+		exit 1
 	fi
 
 	# cleanup the test directory
