@@ -2,6 +2,7 @@
 *.cmo
 *.cmi
 # compilation results
+*.o
 *.out
 *.S
 bmc
