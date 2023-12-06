@@ -6,7 +6,8 @@ type t =
     | Suffix of t * string
     | Concat of t * t
 
-let empty = Nil 
+let empty =
+    Nil 
 
 let single_line s = 
     Single s 
