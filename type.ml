@@ -41,8 +41,20 @@ let check_decl decl env =
 
 let check_stmt stmt env =
     match stmt with
-    | AssS(id, exp) -> failwith "not implemented"
-    | PrintS exp    -> failwith "not implemented"
+    | AssS(id, exp) -> begin match infer_type exp env with
+                       | None          -> (false, env)
+                       | Some exp_type -> begin match lookup id env with
+                                          | None         -> (false, env)
+                                          | Some id_type -> if exp_type = id_type
+                                                            then (true, env)
+                                                            else (false, env)
+                                          end
+                       end
+    (* for now - only int statements! *)
+    | PrintS exp    -> let exp_type = infer_type exp env in
+                           if exp_type = Some (Syntax.IntT)
+                           then (true, env)
+                           else (false, env)
                     
 
 let check_instr instr env =
