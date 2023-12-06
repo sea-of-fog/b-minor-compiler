@@ -183,7 +183,7 @@ let rec program_parser_list ts acc =
     match instruction_parser ts with
     | None -> acc
     | Some(instr, rest) -> match rest with
-                           | []   -> rest::acc
+                           | []   -> (instr)::acc
                            | _    -> program_parser_list rest (instr::acc)
 
 let program_parser ts =
