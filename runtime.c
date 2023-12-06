@@ -2,11 +2,11 @@
 #include<stdbool.h>
 
 void print_int(int n){
-	printf("%ld", n);
+	printf("%ld\n", n);
 	return;
 }
 
 void print_bool(bool b){
-	printf("%s", b ? "true" : "false");
+	printf("%s\n", b ? "true" : "false");
 	return;
 }
