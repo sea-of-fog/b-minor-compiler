@@ -1,1 +1,1 @@
-val check_if_declared : Syntax.program -> bool
+val check_if_declared : Syntax.prog -> bool

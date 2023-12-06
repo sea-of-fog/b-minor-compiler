@@ -1,5 +1,5 @@
 declare -i NUM_OF_TESTS
-NUM_OF_TESTS=1
+NUM_OF_TESTS=2
 
 for i in $(seq 1 1 $NUM_OF_TESTS)
 do
@@ -12,7 +12,7 @@ do
 
 	# check the answer
 	./a.out > ans.out
-	if cmp -s ans.out expected_ans.out; then
+	if cmp -s ans.out expected.ans; then
 		echo "test $i correct"
 	else 
 		echo "test $i incorrect"
