@@ -1,5 +1,5 @@
 declare -i NUM_OF_TESTS
-NUM_OF_TESTS=1
+NUM_OF_TESTS=2
 
 for i in $(seq 1 1 $NUM_OF_TESTS)
 do
