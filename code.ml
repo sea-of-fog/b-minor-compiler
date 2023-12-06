@@ -31,7 +31,7 @@ let rec append_cps xs ys k =
 
 let rec suffix_cps xs x k =
     match xs with
-    | []    -> x::[]
+    | []    -> k [x]
     | r::rs -> suffix_cps rs x (fun res -> k (r::res))
 
 let rec to_lines_cps code k =
