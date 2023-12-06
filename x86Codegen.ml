@@ -65,12 +65,12 @@ let rec expr_codegen exp table =
 let stmt_codegen stmt =
     match stmt with
     | AssS(id, exp) -> let (exp_code, _, res_register) = expr_codegen exp scratch_table in
-        let new_code = "MOVQ ["^id^"], "^res_register in
+        let new_code = "MOVQ "^res_register^", ["^id^"]" in
             exp_code@[new_code]
     | PrintS(exp)   -> let (exp_code, _, res_register) = expr_codegen exp scratch_table in
                             let new_code = ["MOVQ  $format, %rdi"; 
                                             "MOVQ  "^res_register^" , %rsi"; 
-                                            "MOVQ  $0";
+                                            "XOR   %eax, %eax";
                                             "PUSHQ %r10";
                                             "PUSHQ %r11";
                                             "CALL  printf";
@@ -81,7 +81,7 @@ let stmt_codegen stmt =
 let decl_codegen decl =
     match decl with
     | SimpDec(id, typ, exp) -> let (exp_code, _, res_register) = expr_codegen exp scratch_table in
-                                   let new_code = "MOVQ ["^id^"], "^res_register in
+                                   let new_code = "MOVQ "^res_register^", ["^id^"]" in
                                        exp_code@(new_code::[])
 
 let instruction_codegen instr =

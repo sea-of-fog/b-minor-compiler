@@ -156,14 +156,18 @@ let decl_parser ts =
 
 let stmt_parser ts =
     match ts with
-    | (Id id)::Equal::ts -> begin match expr_parser ts with
-                            | Some (exp, rest) -> Some (AssS(id, exp), rest)
-                            | None             -> None
-                            end
-    | (Keyword Print)::ts -> begin match expr_parser ts with
-                             | Some (exp, rest) -> Some (PrintS exp, rest)
-                             | None             -> None
-                             end
+    | (Id id)::Equal::ts -> 
+        begin match expr_parser ts with
+        | Some (exp, rest) -> Some (AssS(id, exp), rest)
+        | None             -> None
+        end
+    | (Keyword Print)::ts -> 
+        begin match expr_parser ts with
+        | Some (exp, rest) -> Some (PrintS exp, rest)
+        | None             -> None
+        end
+    | _ -> 
+        None
                              
 
 
