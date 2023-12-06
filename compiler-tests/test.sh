@@ -1,6 +1,12 @@
 declare -i NUM_OF_TESTS
 NUM_OF_TESTS=1
 
+# check if the compiler is built
+if !(test -f ../bmc); then
+	echo "Error: compiler not build"
+	exit 1
+fi
+
 for i in $(seq 1 1 $NUM_OF_TESTS)
 do
 
