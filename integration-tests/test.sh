@@ -1,5 +1,9 @@
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BOLD=$(tput bold)
+
 declare -i NUM_OF_TESTS
-NUM_OF_TESTS=2
+NUM_OF_TESTS=7
 
 # check if the compiler is built
 if !(test -f ../bmc); then
@@ -19,9 +23,9 @@ do
 	# check the answer
 	./a.out > ans.out
 	if cmp -s ans.out expected.ans; then
-		echo "test $i correct"
+		echo -e "${BOLD}${GREEN}test $i correct"
 	else 
-		echo "test $i incorrect"
+		echo -e "${BOLD}${RED}test $i incorrect"
 		exit 1
 	fi
 
