@@ -1,5 +1,5 @@
 declare -i NUM_OF_TESTS
-NUM_OF_TESTS=5
+NUM_OF_TESTS=6
 
 # check if the compiler is built
 if !(test -f ../bmc); then
