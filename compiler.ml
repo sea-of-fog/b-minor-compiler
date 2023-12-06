@@ -28,4 +28,4 @@ let () = if Type.check prog
 let target_code = X86Codegen.program_codegen prog
 
 let () = let channel = Out_channel.open_text output_file in 
-            output_lines channel target_code
+    output_lines channel target_code; Out_channel.close channel
