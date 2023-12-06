@@ -10,10 +10,10 @@
 1. [X] Generate code for print
 2. [X] Booleans
 3. [ ] Division operator in codegen
-4. [ ] Boolean operators in codegen
+4. [X] Boolean operators in codegen
 5. [X] Add interfaces to modules
 6. [X] Typechecking/type inference
-7. [ ] Print booleans
+7. [X] Print booleans
 8. [X] Parsing whitespace
 9. [ ] Postfix operators
 10. [ ] Add unit tests
