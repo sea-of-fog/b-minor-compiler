@@ -15,15 +15,16 @@ let read_whole_file filename =
 let source_code = read_whole_file source_file
 
 let ts = Scanner.main_lex source_code
+
 let prog = Parsing.program_parser ts
 
 let () = if Analyser.check_if_declared prog
          then ()
-         else print_endline "There are undeclared variables"; exit 0
+         else failwith "there are undeclared variables"
 
 let () = if Type.check prog
          then ()
-         else print_endline "Type error"; exit 0
+         else failwith "type error"
 
 let target_code = X86Codegen.program_codegen prog
 
