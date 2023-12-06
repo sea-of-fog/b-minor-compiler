@@ -1,11 +1,6 @@
 declare -i NUM_OF_TESTS
 NUM_OF_TESTS=1
 
-# build the compiler
-cd ..
-./build.sh > /dev/null
-cd compiler-tests
-
 for i in $(seq 1 1 $NUM_OF_TESTS)
 do
 
