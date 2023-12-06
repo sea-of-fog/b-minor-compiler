@@ -17,8 +17,8 @@
 8. [X] Parsing whitespace
 9. [ ] Postfix operators
 10. [ ] Add unit tests
-11. [ ] Testing infrastructure
-12. [ ] Fix bug in the compiler app
+11. [X] Testing infrastructure
+12. [X] Fix bug in the compiler app
 13. [X] Add types to declarations
 14. [ ] If/else
 15. [ ] Uninitialised declarations
