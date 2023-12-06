@@ -51,7 +51,7 @@ open Syntax
 (* E' -> +TE' | -TE' | \varepsilon *)
 (* T  -> AT' *)
 (* T' -> *AT' | /AT' | \varepsilon *)
-(* A -> Number | Id | True | False | (E) *)
+(* A -> Number | Id | True | False | (OrE) *)
 
 let rec or_parser ts =
     match and_parser ts with
@@ -135,7 +135,7 @@ and atom_parser ts =
     | (Id id)::rest    -> Some ((VarE id), rest)
     | (Keyword True)::rest -> Some (TrueE, rest)
     | (Keyword False)::rest -> Some (FalseE, rest)
-    | OpenParen::ts -> (match expr_parser ts with
+    | OpenParen::ts -> (match or_parser ts with
                         | None -> None
                         | Some (exp, rest) -> match rest with
                                               | ClosedParen::rest -> Some (exp, rest)
@@ -144,11 +144,11 @@ and atom_parser ts =
 
 let decl_parser ts =
     match ts with
-    | (Keyword Let)::(Id id)::(Colon)::(Keyword Int)::Equal::ts -> begin match expr_parser ts with
+    | (Keyword Let)::(Id id)::(Colon)::(Keyword Int)::Equal::ts -> begin match or_parser ts with
                                                                    | Some (exp, rest) -> Some(SimpDec(id, IntT, exp), rest)
                                                                    | None             -> None
                                                                    end
-    | (Keyword Let)::(Id id)::(Colon)::(Keyword Bool)::Equal::ts -> begin match expr_parser ts with
+    | (Keyword Let)::(Id id)::(Colon)::(Keyword Bool)::Equal::ts -> begin match or_parser ts with
                                                                    | Some (exp, rest) -> Some(SimpDec(id, BoolT, exp), rest)
                                                                    | None             -> None
                                                                    end
@@ -157,12 +157,12 @@ let decl_parser ts =
 let stmt_parser ts =
     match ts with
     | (Id id)::Equal::ts -> 
-        begin match expr_parser ts with
+        begin match or_parser ts with
         | Some (exp, rest) -> Some (AssS(id, exp), rest)
         | None             -> None
         end
     | (Keyword Print)::ts -> 
-        begin match expr_parser ts with
+        begin match or_parser ts with
         | Some (exp, rest) -> Some (PrintS(exp, None), rest)
         | None             -> None
         end
@@ -178,7 +178,7 @@ let instruction_parser ts =
     | None -> match stmt_parser ts with
               | Some(stmt, SemiColon::rest) -> Some ((Stmt stmt), rest)
               | Some(stmt, rest) -> failwith "expected ;"
-              | None -> match expr_parser ts with
+              | None -> match or_parser ts with
                         | Some(exp, SemiColon::rest) -> Some (Expr exp, rest)
                         | Some(exp, rest)            -> failwith "expected ;"
                         | None -> None
