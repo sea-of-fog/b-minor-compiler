@@ -5,8 +5,8 @@ ocamlc -c syntax.ml
 ocamlc -c scanner.mli
 ocamlc -c scanner.ml
 
-ocamlc -c parser.mli
-ocamlc -c parser.ml
+ocamlc -c parsing.mli
+ocamlc -c parsing.ml
 
 ocamlc -c type.mli
 ocamlc -c type.ml
