@@ -3,14 +3,14 @@ NUM_OF_TESTS=1
 
 # build the compiler
 cd ..
-./build.sh
+./build.sh > /dev/null
 cd compiler-tests
 
 for i in $(seq 1 1 $NUM_OF_TESTS)
 do
 
 	# build the test program
-	cd test_$i
+	cd test$i
 	../../bmc test.bm test.S
 	gcc -no-pie test.S
 
