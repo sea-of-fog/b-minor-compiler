@@ -43,9 +43,9 @@ type stmt =
     | AssS of string * expr
     | PrintS of expr
 
-type instruction =
+type instr =
     | Expr of expr
     | Decl of decl
     | Stmt of stmt
 
-type program = instruction list
+type prog = instr list

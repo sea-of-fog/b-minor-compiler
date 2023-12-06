@@ -14,8 +14,11 @@ ocamlc -c type.ml
 ocamlc -c analyser.mli
 ocamlc -c analyser.ml
 
+ocamlc -c code.mli
+ocamlc -c code.ml
+
 ocamlc -c x86Codegen.mli
-ocamlc -c x86Codegen.ml
+ocamlc code.cmo -c x86Codegen.ml
 
 ocamlc syntax.cmo scanner.cmo parsing.cmo type.cmo analyser.cmo x86Codegen.cmo compiler.ml -o bmc
 chmod +x bmc

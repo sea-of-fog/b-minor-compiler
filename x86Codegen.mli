@@ -1,1 +1,1 @@
-val program_codegen : Syntax.program -> string list
+val program_codegen : Syntax.prog -> string list
