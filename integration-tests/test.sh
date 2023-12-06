@@ -3,7 +3,7 @@ GREEN='\033[0;32m'
 BOLD=$(tput bold)
 
 declare -i NUM_OF_TESTS
-NUM_OF_TESTS=7
+NUM_OF_TESTS=9
 
 # check if the compiler is built
 if !(test -f ../bmc); then
@@ -17,7 +17,7 @@ do
 	# build the test program
 	cd test$i
 	../../bmc test.bm test.S
-	gcc -no-pie test.S
+	gcc ../../runtime.o -no-pie test.S
 
 
 	# check the answer

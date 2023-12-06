@@ -13,10 +13,10 @@ let rec check_expr exp declared =
 
 let check_stmt stmt declared =
     match stmt with
-    | PrintS exp    -> check_expr exp declared
-    | AssS(id, exp) -> if (check_expr exp declared)
-                       then lookup declared id
-                       else false
+    | PrintS(exp, _) -> check_expr exp declared
+    | AssS(id, exp)  -> if (check_expr exp declared)
+                        then lookup declared id
+                        else false
 
 let check_decl decl declared =
     match decl with

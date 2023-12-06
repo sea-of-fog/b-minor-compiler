@@ -63,21 +63,45 @@ let rec expr_codegen (exp : Syntax.expr) table =
                                 |> Code.add_line ("MOVQ %rax, "^right_res),
                                 scratch_free left_res right_table,
                                 right_res)
+    | OpE(And, exp1, exp2) -> let left_code, left_table, left_res = expr_codegen exp1 table in
+                              let right_code, right_table, right_res = expr_codegen exp2 left_table in
+                              ( Code.concat left_code right_code
+                                |> Code.add_line ("ANDQ "^left_res^", "^right_res),
+                                scratch_free left_res right_table,
+                                right_res)
+    | OpE(Or, exp1, exp2) -> let left_code, left_table, left_res = expr_codegen exp1 table in
+                              let right_code, right_table, right_res = expr_codegen exp2 left_table in
+                              ( Code.concat left_code right_code
+                                |> Code.add_line ("ORQ "^left_res^", "^right_res),
+                                scratch_free left_res right_table,
+                                right_res)
 
 let stmt_codegen (stmt : Syntax.stmt) : Code.t =
     match stmt with
     | AssS(id, exp) -> let (exp_code, _, res_register) = expr_codegen exp scratch_table in
                            Code.add_line ("MOVQ "^res_register^", ["^id^"]") exp_code
-    | PrintS(exp)   -> let (exp_code, _, res_register) = expr_codegen exp scratch_table in
-                            exp_code
-                            |> Code.add_line "MOVQ  $format, %rdi"
-                            |> Code.add_line ("MOVQ  "^res_register^" , %rsi")
-                            |> Code.add_line "XOR   %eax, %eax"
-                            |> Code.add_line "PUSHQ %r10"
-                            |> Code.add_line "PUSHQ %r11"
-                            |> Code.add_line "CALL  printf"
-                            |> Code.add_line "POPQ  %r11";
-                            |> Code.add_line "POPQ  %r10"
+    | PrintS(exp, Some typ) -> 
+        match typ with
+        | IntT ->
+            let (exp_code, _, res_register) = expr_codegen exp scratch_table in
+                exp_code
+                |> Code.add_line ("MOVQ  "^res_register^", %rdi")
+                |> Code.add_line "XOR   %eax, %eax"
+                |> Code.add_line "PUSHQ %r10"
+                |> Code.add_line "PUSHQ %r11"
+                |> Code.add_line "CALL  print_int"
+                |> Code.add_line "POPQ  %r11";
+                |> Code.add_line "POPQ  %r10"
+        | BoolT ->
+            let (exp_code, _, res_register) = expr_codegen exp scratch_table in
+                exp_code
+                |> Code.add_line ("MOVQ  "^res_register^", %rdi")
+                |> Code.add_line "XOR   %eax, %eax"
+                |> Code.add_line "PUSHQ %r10"
+                |> Code.add_line "PUSHQ %r11"
+                |> Code.add_line "CALL  print_bool"
+                |> Code.add_line "POPQ  %r11";
+                |> Code.add_line "POPQ  %r10"
 
 let decl_codegen (decl : Syntax.decl) : Code.t =
     match decl with

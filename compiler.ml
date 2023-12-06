@@ -22,11 +22,12 @@ let () = if Analyser.check_if_declared prog
          then ()
          else failwith "there are undeclared variables"
 
-let () = if Type.check prog
-         then ()
-         else failwith "type error"
+let typed_prog =
+    match Type.check prog with
+    | Some prog -> prog
+    | None      -> failwith "type error"
 
-let target_code = X86Codegen.program_codegen prog
+let target_code = X86Codegen.program_codegen typed_prog
 
 let () = let channel = Out_channel.open_text output_file in 
     output_lines channel target_code; Out_channel.close channel
