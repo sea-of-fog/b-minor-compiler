@@ -38,4 +38,4 @@
 2. [ ] function inlining
 
 ## Things to test
-1. [ ] Am I allocating registers correctly? Should they not be freed?
+1. [X] Am I allocating registers correctly? Should they not be freed?
