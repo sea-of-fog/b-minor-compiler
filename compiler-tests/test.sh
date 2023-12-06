@@ -12,7 +12,7 @@ do
 
 	# check the answer
 	./a.out > ans.out
-	if cmp -s ans.out expected_ans.out; then
+	if cmp -s ans.out expected.ans; then
 		echo "test $i correct"
 	else 
 		echo "test $i incorrect"
