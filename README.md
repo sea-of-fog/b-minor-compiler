@@ -7,8 +7,6 @@
 4. Booleans are encoded as $0 or $(-1)
 
 ## Todo
-1. [X] Generate code for print
-2. [X] Booleans
 3. [ ] Division operator in codegen
 4. [ ] Add modulo operator
 5. [X] Boolean operators in codegen
@@ -39,3 +37,7 @@
 
 ## Things to test
 1. [X] Am I allocating registers correctly? Should they not be freed?
+
+## Done
+1. [X] Generate code for print
+2. [X] Booleans
