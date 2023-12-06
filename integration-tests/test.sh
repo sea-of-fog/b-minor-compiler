@@ -17,7 +17,7 @@ do
 	# build the test program
 	cd test$i
 	../../bmc test.bm test.S
-	gcc -no-pie test.S
+	gcc ../../runtime.o -no-pie test.S
 
 
 	# check the answer

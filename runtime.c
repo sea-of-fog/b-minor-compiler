@@ -2,7 +2,7 @@
 #include<stdbool.h>
 
 void print_int(int n){
-	printf("%ld\n", n);
+	printf("%d\n", n);
 	return;
 }
 
