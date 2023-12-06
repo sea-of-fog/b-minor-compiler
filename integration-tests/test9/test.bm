@@ -1,0 +1,6 @@
+let x : bool = true;
+let y : bool = false;
+
+print x&&y;
+print x||y;
+print x&&x||y&&y;
