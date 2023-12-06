@@ -1,0 +1,14 @@
+let fact : int = 1;
+print fact;
+
+fact = fact*2;
+print fact;
+
+fact = fact*3;
+print fact;
+
+fact = fact*4;
+print fact;
+
+fact = fact*5;
+print fact;

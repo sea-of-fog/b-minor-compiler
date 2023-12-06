@@ -1,5 +1,8 @@
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+
 declare -i NUM_OF_TESTS
-NUM_OF_TESTS=6
+NUM_OF_TESTS=7
 
 # check if the compiler is built
 if !(test -f ../bmc); then
