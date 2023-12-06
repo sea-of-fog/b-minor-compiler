@@ -1,1 +1,1 @@
-val check : Syntax.program -> bool
+val check : Syntax.prog -> bool

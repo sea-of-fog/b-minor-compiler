@@ -25,75 +25,76 @@ let scratch_alloc table =
                                table)
 
 (* zwraca kod, tablicę oraz rejestr, w którym jest wynik wyrażenia *) 
-let rec expr_codegen exp table =
+let rec expr_codegen (exp : Syntax.expr) table =
     match exp with
     | VarE(id) -> let free, new_table = scratch_alloc table in
-                    ((("MOVQ ["^id^"], "^free)::[]),
+                    (Code.single_line ("MOVQ ["^id^"], "^free),
                     new_table,
                     free)
     | NumE(n) -> let free, new_table = scratch_alloc table
-                 in ( ("MOVQ $"^(Printf.sprintf "%d" n)^", "^free)::[],
+                 in (Code.single_line ("MOVQ $"^(string_of_int n)^", "^free),
                      new_table,
                      free)
     | TrueE -> let free, new_table = scratch_alloc table
-                 in ( ("MOVQ $(-1), "^free)::[],
+                 in (Code.single_line ("MOVQ $(-1), "^free),
                      new_table,
                      free)
     | FalseE -> let free, new_table = scratch_alloc table
-                 in ( ("MOVQ $0, "^free)::[],
+                 in (Code.single_line ("MOVQ $0, "^free),
                      new_table,
                      free)
     | OpE(Add, exp1, exp2) -> let left_code, left_table, left_res = expr_codegen exp1 table in
                               let right_code, right_table, right_res = expr_codegen exp2 left_table in
-                              ( ("ADDQ "^left_res^", "^right_res)::(right_code@left_code),
+                              ( Code.concat left_code right_code
+                                |> Code.add_line ("ADDQ "^left_res^", "^right_res),
                                 scratch_free left_res right_table,
                                 right_res)
     | OpE(Sub, exp1, exp2) -> let left_code, left_table, left_res = expr_codegen exp1 table in
                               let right_code, right_table, right_res = expr_codegen exp2 left_table in
-                              ( ("SUBQ "^right_res^", "^left_res)::(right_code@left_code),
+                              ( Code.concat left_code right_code
+                                |> Code.add_line ("SUBQ "^left_res^", "^right_res),
                                 scratch_free right_res right_table,
                                 left_res)
     | OpE(Mul, exp1, exp2) -> let left_code, left_table, left_res = expr_codegen exp1 table in
                               let right_code, right_table, right_res = expr_codegen exp2 left_table in
-                              ( ("MOVQ %rax, "^right_res) ::
-                                ("IMUL "^right_res) ::
-                                ("MOVQ "^left_res^", %rax") ::
-                                (right_code@left_code),
+                              ( Code.concat left_code right_code
+                                |> Code.add_line ("MOVQ "^left_res^", %rax")
+                                |> Code.add_line ("IMUL "^right_res)
+                                |> Code.add_line ("MOVQ %rax, "^right_res),
                                 scratch_free left_res right_table,
                                 right_res)
 
-let stmt_codegen stmt =
+let stmt_codegen (stmt : Syntax.stmt) : Code.t =
     match stmt with
     | AssS(id, exp) -> let (exp_code, _, res_register) = expr_codegen exp scratch_table in
-        let new_code = "MOVQ "^res_register^", ["^id^"]" in
-            exp_code@[new_code]
+                           Code.add_line ("MOVQ "^res_register^", ["^id^"]") exp_code
     | PrintS(exp)   -> let (exp_code, _, res_register) = expr_codegen exp scratch_table in
-                            let new_code = ["MOVQ  $format, %rdi"; 
-                                            "MOVQ  "^res_register^" , %rsi"; 
-                                            "XOR   %eax, %eax";
-                                            "PUSHQ %r10";
-                                            "PUSHQ %r11";
-                                            "CALL  printf";
-                                            "POPQ  %r11";
-                                            "POPQ  %r10"] in
-                                exp_code@new_code
+                            exp_code
+                            |> Code.add_line "MOVQ  $format, %rdi"
+                            |> Code.add_line ("MOVQ  "^res_register^" , %rsi")
+                            |> Code.add_line "XOR   %eax, %eax"
+                            |> Code.add_line "PUSHQ %r10"
+                            |> Code.add_line "PUSHQ %r11"
+                            |> Code.add_line "CALL  printf"
+                            |> Code.add_line "POPQ  %r11";
+                            |> Code.add_line "POPQ  %r10"
 
-let decl_codegen decl =
+let decl_codegen (decl : Syntax.decl) : Code.t =
     match decl with
     | SimpDec(id, typ, exp) -> let (exp_code, _, res_register) = expr_codegen exp scratch_table in
-                                   let new_code = "MOVQ "^res_register^", ["^id^"]" in
-                                       exp_code@(new_code::[])
+                                   Code.add_line ("MOVQ "^res_register^", ["^id^"]") exp_code 
 
-let instruction_codegen instr =
+let instr_codegen (instr : Syntax.instr) : Code.t =
     match instr with
     | Decl(decl) -> decl_codegen decl
     | Stmt(stmt) -> stmt_codegen stmt
-    | Expr(exp)  -> let (code, _, _) = expr_codegen exp scratch_table in (List.rev code)
+    | Expr(exp)  -> let (code, _, _) = expr_codegen exp scratch_table in
+                        code 
 
-let rec program_codegen_helper prog acc =
+let rec prog_codegen_helper (prog : Syntax.prog) (acc : Code.t) : Code.t =
     match prog with
-    | instr::rest -> let code = instruction_codegen instr in
-                        program_codegen_helper rest (acc@code)
+    | instr::rest -> let code = instr_codegen instr in
+                        prog_codegen_helper rest (Code.concat acc code)
     | [] -> acc
 
 let is_decl instr =
@@ -105,21 +106,25 @@ let extract_var_name instr =
     match instr with
     | Decl(SimpDec(id, typ, exp)) -> id
 
-(* integers initialized as 0 *)
-let make_declarations (var_names : string list) : string list =
-    (List.map (fun id -> id^": .quad 0") var_names)
+(* integers and initialized as 0 *)
+let make_declarations (var_names : string list) : Code.t =
+    Code.from_list (List.map (fun id -> id^": .quad 0") var_names)
     
-
-let program_codegen prog =
+let prog_code (prog : Syntax.prog) : Code.t =
     let var_names = prog
                     |> List.filter is_decl
                     |> List.map extract_var_name
-    in let program_code = program_codegen_helper prog []
+    in let prog_code = prog_codegen_helper prog Code.empty 
     in let decl_code = make_declarations var_names in
-        [".data\n";
-         "\tformat: .asciz \"%d\\n\"\n"]@
-        decl_code@
-        [".text\n";
-        "\t.global main\n"; "main: \n"]@
-        program_code@
-        ["RET"]
+        Code.concat 
+                    (decl_code
+                    |> Code.prefix "\tformat: .asciz \"%d\\n\"\n"
+                    |> Code.prefix ".data\n")
+
+                    (Code.add_line "RET" prog_code
+                    |> Code.prefix "main: \n"
+                    |> Code.prefix "\t.global main\n"
+                    |> Code.prefix ".text\n")
+
+let program_codegen prog =
+    Code.to_lines (prog_code prog)

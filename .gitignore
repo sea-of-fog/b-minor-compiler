@@ -3,4 +3,5 @@
 *.cmi
 # compilation results
 *.out
+*.S
 bmc
