@@ -52,7 +52,7 @@ let rec expr_codegen (exp : Syntax.expr) table =
     | OpE(Sub, exp1, exp2) -> let left_code, left_table, left_res = expr_codegen exp1 table in
                               let right_code, right_table, right_res = expr_codegen exp2 left_table in
                               ( Code.concat left_code right_code
-                                |> Code.add_line ("SUBQ "^left_res^", "^right_res),
+                                |> Code.add_line ("SUBQ "^right_res^", "^left_res),
                                 scratch_free right_res right_table,
                                 left_res)
     | OpE(Mul, exp1, exp2) -> let left_code, left_table, left_res = expr_codegen exp1 table in
