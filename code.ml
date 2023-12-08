@@ -24,28 +24,16 @@ let prefix line code =
 let from_list lines =
     List lines
 
-let rec append_cps xs ys k =
-    match xs with
-    | []     -> k ys
-    | x::xs  -> append_cps xs ys (fun res -> k (x::res))
+module D = DiffList
 
-let rec suffix_cps xs x k =
-    match xs with
-    | []    -> k [x]
-    | r::rs -> suffix_cps rs x (fun res -> k (r::res))
-
-let rec to_lines_cps code k =
+let rec to_dlist code =
     match code with
-    | Nil             -> k []
-    | Single l        -> k [l]
-    | List ls         -> k ls
-    | Prefix (l, ls)  -> to_lines_cps ls 
-                             (fun res -> k (l::res))
-    | Suffix (ls, l)  -> to_lines_cps ls 
-                             (fun res -> suffix_cps res l k)
-    | Concat (l1, l2) -> to_lines_cps l1 (fun l1 -> 
-                             to_lines_cps l2 (fun l2 ->
-                                 append_cps l1 l2 k))
+    | Nil              -> D.empty 
+    | Single l         -> D.singleton l
+    | List ls          -> D.of_list ls
+    | Prefix (l, code) -> D.cons l (to_dlist code)
+    | Suffix (code, l) -> D.snoc (to_dlist code) l
+    | Concat (c1, c2)  -> D.((to_dlist c1) ++ (to_dlist c2))
 
-let to_lines code = 
-    to_lines_cps code (fun x -> x)
+let to_lines code =
+    D.to_list @@ to_dlist code
