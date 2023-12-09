@@ -1,0 +1,53 @@
+
+(* This version (v1) of the parser is based on the following CFG:
+ * S -> E (as in "expression")
+ * E -> E + T | E - T | T (as in "term")
+ * T -> N | (E) (N stands for "number")
+ * 
+ * A few notes:
+ * 1) here, we are operating on tokens, so whole numbers are 
+ *    lexical terminals
+ * 2) this grammar has left-recursive productions, so is not suitable
+ *    for automatically generating parsers
+ * 3) however, any valid parsing tree IS LEFT-ASSOCIATIVE
+ * 
+ * The implementation will be based on an alternative, right-recursive
+ * CFG. The trick for eliminating left-recursion can be found in: 
+ * (slides 3/4)
+ * https://people.montefiore.uliege.be/geurts/Cours/compil/2011/03-syntaxanalysis-2.pdf
+ * 
+ * Another useful resource:
+ * https://www.csd.uwo.ca/~mmorenom/CS447/Lectures/Syntax.html/node8.html
+ *
+ * New:
+ * S  -> E
+ * E  -> TE'
+ * E' -> +TE' | -TE' | \varepsilon
+ * T  -> AT'
+ * T' -> *AT' | /AT' | \varepsilon
+ * A -> Number | (E)
+ *
+ * Notes on implementation: 
+ * 1) since we are building left-associative expressions,
+ *    the parsers for T' and S' will return lambdas waiting for the right term
+ *)
+
+(* the v2 version will deal with actual programs, not just expressions! *)
+(* a program in v2 is a sequence of instructions. an instruction is a declaration (with let!), *)
+(* an assignment statement or an expression *)
+
+(* The grammar is now: *)
+
+(* S -> I SemiColon S | varepsilon *)
+(* I -> D | St | E *)
+(* D -> Let Id Colon Typ Equal E *)
+(* St -> Id Equal E | Print E *)
+(* OrE -> AndE OrE'*)
+(* OrE' -> Or AndE OrE' | \varepsilon *)
+(* AndE -> E AndE' *)
+(* AndE' -> And E AndE' | \varepsilon *)
+(* E -> TE' *)
+(* E' -> +TE' | -TE' | \varepsilon *)
+(* T  -> AT' *)
+(* T' -> *AT' | /AT' | \varepsilon *)
+(* A -> Number | Id | True | False | (OrE) *)

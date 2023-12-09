@@ -2,7 +2,10 @@ open Syntax
 
 type 'a pars = token list -> ('a * token list) option
 
-let (&&&) (p1 : 'a pars) (p2 : 'b pars) : ('a * 'b) pars = 
+let eps (res : 'a) : 'a pars =
+    (fun ts -> (res, ts))
+
+let (++) (p1 : 'a pars) (p2 : 'b pars) : ('a * 'b) pars = 
     (fun ts -> match p1 ts with
                | None -> None
                | Some (r1, ts) -> begin match p2 ts with
@@ -10,7 +13,7 @@ let (&&&) (p1 : 'a pars) (p2 : 'b pars) : ('a * 'b) pars =
                                   | Some(r2, ts) -> Some((r1, r2), ts)
                                   end)
 
-let (|||) (p1 : 'a pars) (p2 : 'a pars) : 'a pars = (fun ts ->
+let (<|>) (p1 : 'a pars) (p2 : 'a pars) : 'a pars = (fun ts ->
     match p1 ts with
     | Some x -> Some x
     | None   -> begin match p2 ts with
