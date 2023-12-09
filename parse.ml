@@ -1,8 +1,8 @@
 open Syntax
 open ParseLib
 
-let number ts =
-    match ts with
+let number : (Syntax.expr ParseLib.pars) =
+    function
     | (Number n)::ts -> Some (NumE n, ts)
     | _              -> None
 
@@ -33,25 +33,25 @@ let open_paren ts =
 
 let closed_paren ts =
     match ts with
-    | ClosedPare::ts -> Some((), ts)
-    | _              -> None
+    | ClosedParen::ts -> Some((), ts)
+    | _               -> None
 
-let rec expr =
-    (term ++ expr_prime) >> (fun (e, k) -> k e)
+let rec expr ts =
+    ((term ++ expr_prime) >> (fun (e, k) -> k e)) ts
 
-and expr_prime =
-    ((add ++ term ++ expr_prime) >> (fun ((op, e), k) -> (fun t -> k @@ OpE(op, t, e))))
+and expr_prime ts =
+    (((add ++ term ++ expr_prime) >> (fun ((op, e), k) -> (fun t -> k @@ OpE(op, t, e))))
  <|>((sub ++ term ++ expr_prime) >> (fun ((op, e), k) -> (fun t -> k @@ OpE(op, t, e))))
- <|>((eps (fun e -> e)))
+ <|>((eps (fun e -> e)))) ts
 
-and term = 
-    (atom ++ term_prime) >> (fun (e, k) -> k e)
+and term ts = 
+    ((atom ++ term_prime) >> (fun (e, k) -> k e)) ts
 
-and term_prime =
-    ((mul ++ atom ++ term_prime) >> (fun ((op, e), k) -> (fun t -> k @@ OpE(op, t, e))))
+and term_prime ts =
+    ((((mul ++ atom) ++ term_prime) >> (fun ((op, e), k) -> (fun t -> k @@ OpE(op, t, e))))
  <|>((div ++ atom ++ term_prime) >> (fun ((op, e), k) -> (fun t -> k @@ OpE(op, t, e))))
- <|>((eps (fun e -> e)))
+ <|>((eps (fun e -> e)))) ts
 
-and atom =
-    number
- <|>((open_paren ++ expr ++ closed_paren) >> (fun ((_, e), _) -> e))
+and atom ts =
+    (number 
+ <|>((open_paren ++ expr ++ closed_paren) >> (fun ((_, (e : expr)), _) -> e))) ts
