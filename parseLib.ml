@@ -19,7 +19,7 @@ let (|||) (p1 : 'a pars) (p2 : 'a pars) : 'a pars = (fun ts ->
                 end)
 
 let rec many (p : 'a pars) : 'a list pars =
-    (fun ts -> match p1 ts with
+    (fun ts -> match p ts with
                | None        -> Some([], ts)
                | Some(r, ts) -> let (rs, ts) = many p ts in
                                     (r::rs, ts))
