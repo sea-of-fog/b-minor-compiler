@@ -18,21 +18,22 @@ only r10-r15 are used for scratch.
 5. [ ] Add modulo operator
 6. [ ] Postfix operators
 7. [ ] Add unit tests
-8. [ ] If/else
-9. [ ] Elif
-10. [ ] Uninitialised declarations
-11. [ ] Check for initialised declarations
-12. [ ] Loops
-13. [ ] Arrays
-14. [ ] Function primitives
-15. [ ] Function declarations
-16. [ ] Constant folding/propagation
-17. [ ] Refactor lexing
-18. [ ] Generate useful errors from initialization/declaration check
-19. [ ] Make typechecker monadic
-20. [ ] Comments
-21. [ ] Code blocks
-22. [ ] Change print statement to book version
+8. [ ] Boolean not operator
+9. [ ] If/else
+10. [ ] Elif
+11. [ ] Uninitialised declarations
+12. [ ] Check for initialised declarations
+13. [ ] Loops
+14. [ ] Arrays
+15. [ ] Function primitives
+16. [ ] Function declarations
+17. [ ] Constant folding/propagation
+18. [ ] Refactor lexing
+19. [ ] Generate useful errors from initialization/declaration check
+20. [ ] Make typechecker monadic
+21. [ ] Comments
+22. [ ] Code blocks
+23. [ ] Change print statement to book version
 
 ## Done
 1. [X] Boolean operators in codegen
