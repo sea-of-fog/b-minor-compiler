@@ -11,21 +11,27 @@ When generating expressions, rbx and r9 are ALWAYS kept free,
 only r10-r15 are used for scratch.
 
 ## Todo
-1. [ ] Division operator in codegen
-2. [ ] Add modulo operator
-3. [ ] Postfix operators
-4. [ ] Add unit tests
-5. [ ] If/else
-6. [ ] Uninitialised declarations
-7. [ ] Check for initialised declarations
-8. [ ] Loops
-9. [ ] Arrays
-10. [ ] Function primitives
-11. [ ] Function declarations
-12. [ ] Constant folding/propagation
-13. [ ] Refactor lexing
-14. [ ] Generate useful errors from initialization/declaration check
-15. [ ] Make typechecker monadic
+1. [ ] Grammar: make assingment an expression
+2. [ ] Grammar: add annotations to AST
+3. [ ] Division operator in codegen
+4. [ ] Add modulo operator
+5. [ ] Postfix operators
+6. [ ] Add unit tests
+7. [ ] If/else
+8. [ ] Elif
+9. [ ] Uninitialised declarations
+10. [ ] Check for initialised declarations
+11. [ ] Loops
+12. [ ] Arrays
+13. [ ] Function primitives
+14. [ ] Function declarations
+15. [ ] Constant folding/propagation
+16. [ ] Refactor lexing
+17. [ ] Generate useful errors from initialization/declaration check
+18. [ ] Make typechecker monadic
+19. [ ] Comments
+20. [ ] Code blocks
+21. [ ] Change print statement to book version
 
 ## Done
 1. [X] Boolean operators in codegen
