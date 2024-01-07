@@ -50,29 +50,33 @@ type stmt =
 
 type prog = stmt list
 
-type 'a, 'b ann_expr =
+type 'a ann_expr =
     | NumAE   of 'a * int
-    | OpAE    of 'a * op * expr * expr
-    | VarAE   of 'a * 'b
-    | AssAE   of 'a * string * expr
-    | TrueAE  of 'a
+    | OpAE    of 'a * op * ('a ann_expr) * ('a ann_expr)
+    | VarAE   of 'a 
+    | AssAE   of 'a * ('a ann_expr)
+    | TrueAE  of 'a 
     | FalseAE of 'a
 
-type 'b, 'c ann_decl =
-    | SimpADec of 'c * typ * ('b, 'c ann_expr)
+type 'a ann_decl =
+    | SimpADec of 'a * typ * ('a ann_expr)
 
-(* annotated statements: variables for block data, expression data, memory representation *)
-type 'a, 'b, 'c ann_stmt =
-    | PrintS of 'b, 'c ann_expr 
-    | DeclS  of 'c ann_decl
-    | ExprS  of 'b, 'c expr 
-    | BlockS of 'a * ('a, 'b, 'c stmt) list
+type ('a, 'b) ann_stmt =
+    | PrintAS of 'b ann_expr 
+    | DeclAS  of 'b ann_decl
+    | ExprAS  of 'b ann_expr 
+    | BlockAS of 'a * (('a, 'b) ann_stmt) list
 
-type 'a, 'b, 'c ann_prog =
-    'a, 'b, 'c ann_stmt list
+type ('a, 'b) ann_prog =
+    ('a, 'b) ann_stmt list
     
 type location =
     | Global of string
     | Local  of { scope : int;
                   pos   : int
                 }
+    | Temp
+
+type block_data = 
+    { name : string;
+      local_vars : int }

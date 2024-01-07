@@ -1,41 +1,65 @@
 open Syntax
+open ScopeTable
 
 (* This module checks if every variable used has already been declared *)
 
-let empty_env =
-    []
+type block_data = 
+    { label : string;
+      local_vars : int }
 
-let lookup decl x =
-    List.mem x decl
+let rec resolve_expr expr = 
+    match expr with
+    | NumE n -> 
+        return @@ NumAE (Temp, n) 
+    | OpE (op, e1, e2) ->
+        let* ann_e1 = resolve_expr e1 in
+            let* ann_e2 = resolve_expr e2 in
+                return @@ OpAE (Temp, op, ann_e1, ann_e2)
+    | VarE id -> 
+        let* location = lookup id in
+            return @@ VarAE location
+    | AssE (id, e) ->
+        let* location = lookup id in
+            let* ann_e = resolve_expr e in
+                return @@ AssAE (location, ann_e)
+    | TrueE -> 
+        return @@ TrueAE Temp
+    | FalseE ->
+        return @@ FalseAE Temp
 
-let rec check_expr exp declared =
-    match exp with
-    | NumE _              -> true
-    | TrueE               -> true
-    | FalseE              -> true
-    | VarE s              -> lookup declared s
-    | OpE(op, exp1, exp2) -> (check_expr exp1 declared) && (check_expr exp2 declared)
-    | AssE(name, exp)     -> (lookup declared name) && (check_expr exp declared)
-
-let check_decl decl declared =
+let resolve_decl decl =
     match decl with
-    | SimpDec(id, typ, exp) -> if (check_expr exp declared)
-                               then (true, id::declared)
-                               else (false, id::declared)
+    | SimpDec (id, typ, e) -> 
+        let* ann_e = resolve_expr e in
+            let* location = add_to_current_scope id in
+                return @@ SimpADec (location, typ, ann_e)
 
-let check_stmt stmt declared =
+let rec resolve_stmt stmt =
     match stmt with
-    | DeclS decl     -> check_decl decl declared
-    | ExprS exp      -> (check_expr exp declared, declared)
-    | PrintS(exp, _) -> (check_expr exp declared, declared)
+    | DeclS decl ->
+        let* ann_decl = resolve_decl decl in
+            return @@ DeclAS ann_decl
+    | ExprS expr  -> 
+        let* ann_expr = resolve_expr expr in
+            return @@ ExprAS ann_expr
+    | PrintS (expr, _) -> 
+        let* ann_expr = resolve_expr expr in
+            return @@ PrintAS ann_expr
+    | BlockS ss -> 
+        let* label = generate_label in
+            let* () = open_scope in
+                let* ann_ss = resolve_prog ss in
+                    let* block_cnt = current_scope_size in
+                        let* () = close_scope in
+                            return @@ BlockAS ({ label = label; local_vars = block_cnt }, ann_ss)
 
-let rec check_prog_helper prog declared =
+and resolve_prog prog =
     match prog with
-    | [] -> true
-    | stmt::prog -> let (res, declared) = (check_stmt stmt declared) in
-                        if res
-                        then check_prog_helper prog declared
-                        else false
+    | []         -> return []
+    | stmt::prog -> 
+        let* ann_stmt = resolve_stmt stmt in
+            let* ann_rest = resolve_prog prog in
+                return @@ ann_stmt::ann_rest
 
-let check_if_declared prog =
-    check_prog_helper prog empty_env 
+let resolve prog =
+    run @@ resolve_prog prog

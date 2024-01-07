@@ -27,17 +27,18 @@ if [ $? -ne 0 ]; then
     exit $?
 fi
 
+ocamlc -c scope.mli
+ocamlc -c scope.ml
+if [ $? -ne 0 ]; then
+    echo "Scope resolver did not compile"
+    exit $?
+fi
+
+
 ocamlc -c type.mli
 ocamlc -c type.ml
 if [ $? -ne 0 ]; then
     echo "Typechecker did not compile"
-    exit $?
-fi
-
-ocamlc -c analyser.mli
-ocamlc -c analyser.ml
-if [ $? -ne 0 ]; then
-    echo "Semantic analyser did not compile"
     exit $?
 fi
 
