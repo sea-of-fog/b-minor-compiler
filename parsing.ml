@@ -7,34 +7,22 @@ let number : (Syntax.expr ParseLib.pars) =
     | _              -> None
 
 let add ts =
-    match ts with
-    | (Op Add)::ts -> Some(Add, ts)
-    | _            -> None
+    const (Op Add) Add
 
-let sub ts =
-    match ts with
-    | (Op Add)::ts -> Some(Sub, ts)
-    | _            -> None
+let sub =
+    const (Op Sub) Sub
 
 let mul ts =
-    match ts with
-    | (Op Mul)::ts -> Some(Add, ts)
-    | _            -> None
+    const (Op Mul) Mul
 
-let div ts =
-    match ts with
-    | (Op Div)::ts -> Some(Sub, ts)
-    | _            -> None
+let div =
+    const (Op Div) Div
 
-let open_paren ts =
-    match ts with
-    | OpenParen::ts -> Some((), ts)
-    | _             -> None
+let open_paren =
+    const OpenParen ()
 
-let closed_paren ts =
-    match ts with
-    | ClosedParen::ts -> Some((), ts)
-    | _               -> None
+let closed_paren =
+    const ClosedParen ()
 
 let rec expr ts =
     ((term ++ expr_prime) >> (fun (e, k) -> k e)) ts

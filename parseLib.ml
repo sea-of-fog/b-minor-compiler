@@ -5,6 +5,10 @@ type 'a pars = token list -> ('a * token list) option
 let eps (res : 'a) : 'a pars =
     (fun ts -> Some (res, ts))
 
+let const (t : token) (res : 'a) : 'a pars = function
+    | t::ts -> Some(res, ts)
+    | _     -> None
+
 let (++) (p1 : 'a pars) (p2 : 'b pars) : ('a * 'b) pars = 
     (fun ts -> match p1 ts with
                | None -> None
