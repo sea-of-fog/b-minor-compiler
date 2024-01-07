@@ -57,25 +57,38 @@ and stmt ts =
  <|>((id ++ equal ++ expr) >> (fun (((Id x), _), expr) -> AssS(x, expr)))) ts
 
 and expr ts =
-    ((term ++ expr_prime) >> (fun (e, k) -> k e)) ts
+    or_expr ts
 
-and expr_prime ts =
-    (((add ++ term ++ expr_prime) >> (fun ((op, e), k) -> (fun t -> k @@ OpE(op, t, e))))
- <|>((sub ++ term ++ expr_prime) >> (fun ((op, e), k) -> (fun t -> k @@ OpE(op, t, e))))
- <|>((eps (fun e -> e)))) ts
+and or_expr ts =
+    ((liftA3 and_expr (symbol @@ Op Or) or_expr (fun e1 _ e2 -> OpE(Or, e1, e2)))
+<|> and_expr) ts
+
+and and_expr ts =
+    ((liftA3 ar_expr (symbol @@ Op And) and_expr (fun e1 _ e2 -> OpE(And, e1, e2)))
+<|> ar_expr) ts
+
+and ar_expr ts =
+    ((term ++ ar_expr_prime) >> (fun (e, k) -> k e)) ts
+
+and ar_expr_prime ts =
+    (((add ++ term ++ ar_expr_prime) >> (fun ((op, e), k) -> (fun t -> k @@ OpE(op, t, e))))
+<|> ((sub ++ term ++ ar_expr_prime) >> (fun ((op, e), k) -> (fun t -> k @@ OpE(op, t, e))))
+<|> ((eps (fun e -> e)))) ts
 
 and term ts = 
     ((atom ++ term_prime) >> (fun (e, k) -> k e)) ts
 
 and term_prime ts =
     ((((mul ++ atom) ++ term_prime) >> (fun ((op, e), k) -> (fun t -> k @@ OpE(op, t, e))))
- <|>((div ++ atom ++ term_prime) >> (fun ((op, e), k) -> (fun t -> k @@ OpE(op, t, e))))
- <|>((eps (fun e -> e)))) ts
+<|> ((div ++ atom ++ term_prime) >> (fun ((op, e), k) -> (fun t -> k @@ OpE(op, t, e))))
+<|> ((eps (fun e -> e)))) ts
 
 and atom ts =
     (number 
- <|>((open_paren ++ expr ++ closed_paren) >> (fun ((_, (e : expr)), _) -> e))
- <|>(id >> (fun (Id x) -> (VarE x)))) ts
+<|> ((open_paren ++ expr ++ closed_paren) >> (fun ((_, (e : expr)), _) -> e))
+<|> (id >> (fun (Id x) -> (VarE x)))
+<|> ((kword False) >> (fun _ -> FalseE))
+<|> ((kword True)  >> (fun _ -> TrueE))) ts
 
 let program : (prog pars)  = many instr
 
