@@ -6,30 +6,37 @@
 3. Declarations use let - that's easier to parse
 4. Booleans are encoded as $0 or $(-1)
 
+## Register policy on X86_64
+When generating expressions, rbx and r9 are ALWAYS kept free,
+only r10-r15 are used for scratch.
+
 ## Todo
-3. [ ] Division operator in codegen
-4. [ ] Add modulo operator
-5. [X] Boolean operators in codegen
-6. [X] Add interfaces to modules
-7. [X] Typechecking/type inference
-8. [X] Print booleans
-9. [X] Parsing whitespace
-10. [ ] Postfix operators
-11. [ ] Add unit tests
-12. [X] Testing infrastructure
-13. [X] Fix bug in the compiler app
-14. [X] Add types to declarations
-15. [ ] If/else
-16. [ ] Uninitialised declarations
-17. [ ] Check for initialised declarations
-18. [ ] Loops
-19. [ ] Arrays
-20. [ ] Function primitives
-21. [ ] Function declarations
-22. [ ] Constant folding/propagation
-23. [ ] Refactor lexing and parsing
-24. [ ] Generate useful errors from initialization/declaration check
-25. [ ] Make typechecker monadic
+1. [ ] Division operator in codegen
+2. [ ] Add modulo operator
+3. [ ] Postfix operators
+4. [ ] Add unit tests
+5. [ ] If/else
+6. [ ] Uninitialised declarations
+7. [ ] Check for initialised declarations
+8. [ ] Loops
+9. [ ] Arrays
+10. [ ] Function primitives
+11. [ ] Function declarations
+12. [ ] Constant folding/propagation
+13. [ ] Refactor lexing
+14. [ ] Generate useful errors from initialization/declaration check
+15. [ ] Make typechecker monadic
+
+## Done
+1. [X] Boolean operators in codegen
+2. [X] Add interfaces to modules
+3. [X] Typechecking/type inference
+4. [X] Print booleans
+5. [X] Parsing whitespace
+6. [X] Testing infrastructure
+7. [X] Fix bug in the compiler app
+8. [X] Add types to declarations
+9. [X] refactor parsing
 
 ## Optional features
 1. [ ] loop breaks
