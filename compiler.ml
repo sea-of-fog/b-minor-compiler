@@ -18,9 +18,7 @@ let ts = Scanner.main_lex source_code
 
 let prog = Parsing.program_parser ts
 
-let () = if Analyser.check_if_declared prog
-         then ()
-         else failwith "there are undeclared variables"
+let scoped_prog = Scope.resolve prog
 
 let typed_prog =
     match Type.check prog with
