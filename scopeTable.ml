@@ -16,12 +16,12 @@ end
 module M = ErrorStateMonad.Make(State)
 open M
 
-type 'a res = 
-    | Ok   of 'a
-    | Fail of string
-
 type 'a t = 
     'a M.t
+
+type 'a res =
+    | Ok   of 'a
+    | Fail of string
 
 let starting_state = 
    {global_env = [];
@@ -31,8 +31,12 @@ let starting_state =
 
 let return = M.return
 let ( let* ) = M.( let* )
-let run = 
-    failwith "not implemented"
+let run comp = 
+    match M.run starting_state comp with
+    | M.Ok res -> 
+        Ok res
+    | M.Fail msg ->
+        Fail msg
 
 let fail = M.fail
 
@@ -75,13 +79,11 @@ let open_scope =
 let close_scope = 
     let* state = get in
         match state.local_env_stack with
-        | []::rest ->
-            set { local_env_stack = []::(state.local_env_stack);
+        | _::rest ->
+            set { local_env_stack = rest;
                   global_env = state.global_env;
                   current_scope_size = 0;
                   label_num = state.label_num}     
-        | _::rest ->
-            failwith "ScopeTable: tried closing nonempty scope"
         | [] ->
             failwith "ScopeTable: Tried closing global scope"
 

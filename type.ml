@@ -1,86 +1,85 @@
 open Syntax
+open TypeTable
 
-type env = (string * Syntax.typ) list
+let extract_type exp =
+    failwith "not implemented"
 
-let lookup (id : string) (env : env) : Syntax.typ option =
-    List.assoc_opt id env
+let string_of_type typ =
+    match typ with
+    | IntT  -> "int"
+    | BoolT -> "bool"
 
-let empty_env = []
+let rec check_expr expected_type exp =
+    let* ann_exp = infer_expr exp in
+        let actual_type = extract_type ann_exp in
+            if actual_type = expected_type
+            then return ann_exp
+            else fail @@ "expected expression of type "^(string_of_type expected_type)^
+                ", but expression has type "^(string_of_type actual_type)
 
-let add_env id typ env =
-    (id, typ)::env
-
-let rec check_type exp env t =
-    match infer_type exp env with
-    | None ->
-        false
-    | Some inferred_type ->
-        if t = inferred_type
-        then true
-        else false
-
-and infer_type exp env : Syntax.typ option =
+and infer_expr exp =
     match exp with
-    | NumE _          -> Some IntT
-    | TrueE           -> Some BoolT
-    | FalseE          -> Some BoolT
-    | VarE x          -> lookup x env
-    | OpE(op, e1, e2) -> begin match op with
-                         | Add | Sub | Mul | Div -> if check_type e1 env IntT
-                                                    then if check_type e2 env IntT
-                                                         then Some IntT
-                                                         else None
-                                                    else None
-                         | And | Or              -> if check_type e1 env BoolT
-                                                    then if check_type e2 env BoolT
-                                                         then Some BoolT 
-                                                         else None
-                                                    else None
-                         end
-    | AssE(id, exp)   -> match infer_type exp env with
-                         | None   -> None
-                         | Some t -> match lookup id env with
-                                     | Some typ -> if typ = t
-                                                   then Some typ
-                                                   else None
-                                     | None     -> failwith "unbound variable in typechecking - scope checker fucked up"
+    | NumAE(loc, n) ->
+        return @@ NumAE ((loc, IntT), n)
+    | TrueAE loc -> 
+        return @@ TrueAE (loc, BoolT)
+    | FalseAE loc -> 
+        return @@ FalseAE (loc, BoolT)
+    | VarAE loc -> 
+        let* typ = lookup loc in
+            return @@ VarAE (loc, typ)
+    | OpAE(loc, op, e1, e2) -> 
+        begin match op with
+        | Add | Sub | Mul | Div ->
+            let* ann_e1 = check_expr IntT e1 in
+                let* ann_e2 = check_expr IntT e2 in
+                    return @@ OpAE((loc, IntT), op, ann_e1, ann_e2)
+        | Or | And ->
+            let* ann_e1 = check_expr BoolT e1 in
+                let* ann_e2 = check_expr BoolT e2 in
+                    return @@ OpAE((loc, BoolT), op, ann_e1, ann_e2)
+        end
+    | AssAE(loc, exp) -> 
+        let* expected_type = lookup loc in
+            let* ann_exp = check_expr expected_type exp in
+                return @@ AssAE((loc, expected_type), ann_exp)
 
 
-let check_decl decl env : ((Syntax.decl * env) option) =
+let infer_decl decl =
     match decl with
-    | SimpDec(id, typ, exp) -> if check_type exp env typ
-                               then Some (decl, add_env id typ env)
-                               else None
+    | SimpADec(loc, typ, exp) -> 
+        let* ann_exp = check_expr typ exp in
+            return @@ SimpADec((loc, typ), typ, ann_exp)
 
-let check_stmt stmt env : (Syntax.stmt * env) option =
+let rec infer_stmt stmt =
     match stmt with
-    | DeclS decl     -> begin match check_decl decl env with
-                        | Some (decl, env) -> Some ((DeclS decl), env)
-                        | None             -> None
-                        end
-    | ExprS expr     -> begin match infer_type expr env with
-                        | Some t -> Some (ExprS expr, env)
-                        | None   -> None
-                        end
-    | PrintS(exp, _) -> begin match infer_type exp env with
-                        | Some IntT  -> Some (PrintS(exp, Some IntT), env)
-                        | Some BoolT -> Some (PrintS(exp, Some BoolT), env)
-                        (* not printable *)
-                        | _          -> None
-                        end
+    | DeclAS decl ->
+        let* ann_decl = infer_decl decl in
+            begin match ann_decl with
+            | SimpADec((loc, typ), _, _) ->
+                let* () = add_to_current_scope loc typ in
+                    return @@ DeclAS ann_decl
+            end
+    | ExprAS exp ->
+        let* ann_exp = infer_expr exp in
+            return @@ ExprAS ann_exp
+    | PrintAS exp -> 
+        let* ann_exp = infer_expr exp in
+            return @@ PrintAS ann_exp
+    | BlockAS(block_data, ss) ->
+        let* () = open_scope in
+            let* ann_ss = infer_block ss in
+                let* () = close_scope in
+                    return @@ BlockAS(block_data, ann_ss)
 
-let rec helper prog env =
-    match prog with
-    | []          -> Some []
-    | stmt::prog  -> begin match check_stmt stmt env with
-                     | Some (stmt, env) -> 
-                         begin match helper prog env with
-                         | None      -> None
-                         | Some prog -> Some (stmt::prog)
-                         end
-                     | None -> 
-                         None
-                     end
-
-let check prog =
-    helper prog empty_env
+and infer_block ss =
+    match ss with
+    | [] ->
+        return []
+    | stmt::ss ->
+        let* ann_stmt = infer_stmt stmt in
+            let* ann_ss = infer_block ss in
+                return @@ ann_stmt::ann_ss
+                
+let check scoped_prog =
+    run @@ infer_block scoped_prog

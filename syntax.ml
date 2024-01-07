@@ -43,7 +43,7 @@ type decl =
     | SimpDec of string * typ * expr
 
 type stmt =
-    | PrintS of expr * (typ option)
+    | PrintS of expr
     | DeclS  of decl
     | ExprS  of expr 
     | BlockS of stmt list

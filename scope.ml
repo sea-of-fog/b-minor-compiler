@@ -42,7 +42,7 @@ let rec resolve_stmt stmt =
     | ExprS expr  -> 
         let* ann_expr = resolve_expr expr in
             return @@ ExprAS ann_expr
-    | PrintS (expr, _) -> 
+    | PrintS expr -> 
         let* ann_expr = resolve_expr expr in
             return @@ PrintAS ann_expr
     | BlockS ss -> 
