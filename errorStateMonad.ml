@@ -1,4 +1,4 @@
-module type ErrorStateMonad = 
+module type ErrorStateFunctor = 
     functor (State: sig type t end) ->
     sig
         type 'a res =
@@ -53,4 +53,4 @@ module PrivateMake(State : sig type t end) = struct
 
 end
 
-module Make = (PrivateMake : ErrorStateMonad)
+module Make = (PrivateMake : ErrorStateFunctor)
