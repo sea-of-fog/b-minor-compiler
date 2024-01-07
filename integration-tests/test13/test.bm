@@ -1,0 +1,17 @@
+{
+    let x:int = 17;
+    let y:int = 15;
+    print x+y;
+}
+
+{
+    let x:bool = true;
+    let y:bool = true;
+    print x&&y;
+}
+
+{
+    let x:bool = false;
+    let y:bool = true;
+    print x&&y;
+}

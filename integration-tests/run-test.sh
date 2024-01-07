@@ -3,7 +3,7 @@ GREEN='\033[0;32m'
 BOLD=$(tput bold)
 
 declare -i NUM_OF_TESTS
-NUM_OF_TESTS=11
+NUM_OF_TESTS=14
 
 # check if the compiler is built
 if !(test -f ../bmc); then
@@ -16,21 +16,41 @@ do
 
 	# build the test program
 	cd test$i
-	../../bmc test.bm test.S
-	gcc ../../runtime.o -no-pie test.S
+	../../bmc test.bm test.S > err.out
 
+    # check test type
+    if (test -f expected.ans); then # this is a test, in which the program should compile
 
-	# check the answer
-	./a.out > ans.out
-	if cmp -s ans.out expected.ans; then
-		echo -e "${BOLD}${GREEN}test $i correct"
-	else 
-		echo -e "${BOLD}${RED}test $i incorrect"
-		exit 1
-	fi
+        # compile to machine code
+	    gcc ../../runtime.o -no-pie test.S
+        
+        # check the answer
+        ./a.out > ans.out
+        if cmp -s ans.out expected.ans; then
+            echo -e "${BOLD}${GREEN}test $i correct"
+        else 
+            echo -e "${BOLD}${RED}test $i incorrect"
+            exit 1
+        fi
 
-	# cleanup the test directory
-	rm test.S ans.out a.out
+        # clean up the test directory
+        rm test.S ans.out a.out
+
+    else # this is a test, in which compilation should fail
+
+        # check the error msgs
+        if cmp -s err.out expected.err; then
+            echo -e "${BOLD}${GREEN}test $i correct"
+        else 
+            echo -e "${BOLD}${RED}test $i incorrect"
+            exit 1
+        fi
+
+        # clean up the test directory
+        rm err.out
+
+    fi
+
 	cd ..
 
 done

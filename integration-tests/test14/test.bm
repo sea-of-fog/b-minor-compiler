@@ -1,0 +1,4 @@
+{
+    let x:int = 17;
+}
+print x;
