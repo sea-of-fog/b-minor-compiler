@@ -13,25 +13,26 @@ only r10-r15 are used for scratch.
 ## Todo
 1. [ ] Grammar: make assingment an expression
 2. [ ] Grammar: add annotations to AST
-3. [ ] Division operator in codegen
-4. [ ] Add modulo operator
-5. [ ] Postfix operators
-6. [ ] Add unit tests
-7. [ ] If/else
-8. [ ] Elif
-9. [ ] Uninitialised declarations
-10. [ ] Check for initialised declarations
-11. [ ] Loops
-12. [ ] Arrays
-13. [ ] Function primitives
-14. [ ] Function declarations
-15. [ ] Constant folding/propagation
-16. [ ] Refactor lexing
-17. [ ] Generate useful errors from initialization/declaration check
-18. [ ] Make typechecker monadic
-19. [ ] Comments
-20. [ ] Code blocks
-21. [ ] Change print statement to book version
+3. [ ] Helper: stop build process on error
+4. [ ] Division operator in codegen
+5. [ ] Add modulo operator
+6. [ ] Postfix operators
+7. [ ] Add unit tests
+8. [ ] If/else
+9. [ ] Elif
+10. [ ] Uninitialised declarations
+11. [ ] Check for initialised declarations
+12. [ ] Loops
+13. [ ] Arrays
+14. [ ] Function primitives
+15. [ ] Function declarations
+16. [ ] Constant folding/propagation
+17. [ ] Refactor lexing
+18. [ ] Generate useful errors from initialization/declaration check
+19. [ ] Make typechecker monadic
+20. [ ] Comments
+21. [ ] Code blocks
+22. [ ] Change print statement to book version
 
 ## Done
 1. [X] Boolean operators in codegen
