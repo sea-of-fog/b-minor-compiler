@@ -1,0 +1,11 @@
+let x:int = 20;
+let y:int = 300;
+let z:int = 17329432;
+let t:int = 18740;
+
+x = z = y = t = 1;
+print t;
+print y;
+print z;
+print x;
+print z;

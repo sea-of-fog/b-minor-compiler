@@ -1,6 +1,7 @@
 open Syntax
 
 module M = Map.Make(String)
+type table = bool Map.Make(String).t
 
 let scratch_table =
     [("%r10", false); ("%r11", false); ("%r12", false); ("%r13", false); ("%r14", false); ("%r15", false)]
@@ -25,7 +26,7 @@ let scratch_alloc table =
                                table)
 
 (* zwraca kod, tablicę oraz rejestr, w którym jest wynik wyrażenia *) 
-let rec expr_codegen (exp : Syntax.expr) table =
+let rec expr_codegen (exp : Syntax.expr) table : (Code.t * table * string)=
     match exp with
     | VarE(id) -> let free, new_table = scratch_alloc table in
                     (Code.single_line ("MOVQ ["^id^"], "^free),
@@ -75,13 +76,21 @@ let rec expr_codegen (exp : Syntax.expr) table =
                                 |> Code.add_line ("ORQ "^left_res^", "^right_res),
                                 scratch_free left_res right_table,
                                 right_res)
+    | AssE(id, exp) -> let (exp_code, table, res_register) = expr_codegen exp scratch_table in
+                           (Code.add_line ("MOVQ "^res_register^", ["^id^"]") exp_code,
+                            table,
+                            res_register)
+
+let decl_codegen (decl : Syntax.decl) : Code.t =
+    match decl with
+    | SimpDec(id, typ, exp) -> let (exp_code, _, res_register) = expr_codegen exp scratch_table in
+                                   Code.add_line ("MOVQ "^res_register^", ["^id^"]") exp_code 
 
 let stmt_codegen (stmt : Syntax.stmt) : Code.t =
     match stmt with
-    | AssS(id, exp) -> let (exp_code, _, res_register) = expr_codegen exp scratch_table in
-                           Code.add_line ("MOVQ "^res_register^", ["^id^"]") exp_code
+    | DeclS decl -> decl_codegen decl
     | PrintS(exp, Some typ) -> 
-        match typ with
+        begin match typ with
         | IntT ->
             let (exp_code, _, res_register) = expr_codegen exp scratch_table in
                 exp_code
@@ -102,33 +111,24 @@ let stmt_codegen (stmt : Syntax.stmt) : Code.t =
                 |> Code.add_line "CALL  print_bool"
                 |> Code.add_line "POPQ  %r11";
                 |> Code.add_line "POPQ  %r10"
-
-let decl_codegen (decl : Syntax.decl) : Code.t =
-    match decl with
-    | SimpDec(id, typ, exp) -> let (exp_code, _, res_register) = expr_codegen exp scratch_table in
-                                   Code.add_line ("MOVQ "^res_register^", ["^id^"]") exp_code 
-
-let instr_codegen (instr : Syntax.instr) : Code.t =
-    match instr with
-    | Decl(decl) -> decl_codegen decl
-    | Stmt(stmt) -> stmt_codegen stmt
-    | Expr(exp)  -> let (code, _, _) = expr_codegen exp scratch_table in
+        end
+    | ExprS exp   -> let (code, _, _) = expr_codegen exp scratch_table in
                         code 
 
 let rec prog_codegen_helper (prog : Syntax.prog) (acc : Code.t) : Code.t =
     match prog with
-    | instr::rest -> let code = instr_codegen instr in
+    | stmt::rest -> let code = stmt_codegen stmt in
                         prog_codegen_helper rest (Code.concat acc code)
     | [] -> acc
 
-let is_decl instr =
-    match instr with
-    | Decl(_) -> true
-    | _ -> false
+let is_decl stmt =
+    match stmt with
+    | DeclS(_) -> true
+    | _        -> false
 
-let extract_var_name instr =
-    match instr with
-    | Decl(SimpDec(id, typ, exp)) -> id
+let extract_var_name stmt =
+    match stmt with
+    | DeclS(SimpDec(id, typ, exp)) -> id
 
 (* integers and initialized as 0 *)
 let make_declarations (var_names : string list) : Code.t =

@@ -45,9 +45,9 @@ let typ =
     (const (Keyword Bool) BoolT)
 
 let rec stmt ts = 
-    ((((kword Print) ++ expr) >> (fun (_, expr) -> PrintS(expr, None)))
+    ((((((kword Print) ++ expr) >> (fun (_, expr) -> PrintS(expr, None)))
 <|> (decl >> (fun d -> DeclS d))
-<|> (expr >> (fun e -> ExprS e))) ts
+<|> (expr >> (fun e -> ExprS e))) ++ semicolon) >> ((fun (s, _) -> s))) ts
 
 and decl ts =
     (liftA6 _let id colon typ equal expr (fun _ (Id x) _ typ _ expr -> SimpDec(x, typ, expr))) ts
@@ -90,7 +90,7 @@ and atom ts =
 <|> ((kword False) >> (fun _ -> FalseE))
 <|> ((kword True)  >> (fun _ -> TrueE))) ts
 
-let program : (prog pars)  = many instr
+let program : (prog pars)  = many stmt 
 
 let program_parser ts =
     match program ts with

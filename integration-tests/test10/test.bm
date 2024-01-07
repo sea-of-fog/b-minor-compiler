@@ -1,0 +1,6 @@
+let x:int = 7;
+let y: int = 15;
+x = y = 17;
+
+print x;
+print y;

@@ -25,7 +25,7 @@ and infer_type exp env : Syntax.typ option =
     | TrueE           -> Some BoolT
     | FalseE          -> Some BoolT
     | VarE x          -> lookup x env
-    | OpE(op, e1, e2) -> match op with
+    | OpE(op, e1, e2) -> begin match op with
                          | Add | Sub | Mul | Div -> if check_type e1 env IntT
                                                     then if check_type e2 env IntT
                                                          then Some IntT
@@ -36,6 +36,14 @@ and infer_type exp env : Syntax.typ option =
                                                          then Some BoolT 
                                                          else None
                                                     else None
+                         end
+    | AssE(id, exp)   -> match infer_type exp env with
+                         | None   -> None
+                         | Some t -> match lookup id env with
+                                     | Some typ -> if typ = t
+                                                   then Some typ
+                                                   else None
+                                     | None     -> failwith "unbound variable in typechecking - scope checker fucked up"
 
 
 let check_decl decl env : ((Syntax.decl * env) option) =
@@ -44,48 +52,31 @@ let check_decl decl env : ((Syntax.decl * env) option) =
                                then Some (decl, add_env id typ env)
                                else None
 
-let check_stmt stmt env : (Syntax.stmt option) =
+let check_stmt stmt env : (Syntax.stmt * env) option =
     match stmt with
-    | AssS(id, exp) -> begin match infer_type exp env with
-                       | None          -> None
-                       | Some exp_type -> begin match lookup id env with
-                                          | None         -> None
-                                          | Some id_type -> if exp_type = id_type
-                                                            then Some stmt
-                                                            else None
-                                          end
-                       end
+    | DeclS decl     -> begin match check_decl decl env with
+                        | Some (decl, env) -> Some ((DeclS decl), env)
+                        | None             -> None
+                        end
+    | ExprS expr     -> begin match infer_type expr env with
+                        | Some t -> Some (ExprS expr, env)
+                        | None   -> None
+                        end
     | PrintS(exp, _) -> begin match infer_type exp env with
-                        | Some IntT  -> Some (PrintS(exp, Some IntT))
-                        | Some BoolT -> Some (PrintS(exp, Some BoolT))
+                        | Some IntT  -> Some (PrintS(exp, Some IntT), env)
+                        | Some BoolT -> Some (PrintS(exp, Some BoolT), env)
                         (* not printable *)
                         | _          -> None
                         end
-                    
-
-let check_instr instr env : (Syntax.instr * env) option =
-    match instr with
-    | Expr expr -> begin match infer_type expr env with
-                   | Some t -> Some (Expr expr, env)
-                   | None   -> None
-                   end
-    | Stmt stmt -> begin match check_stmt stmt env with
-                   | Some stmt -> Some (Stmt stmt, env)
-                   | None      -> None
-                   end
-    | Decl decl -> begin match check_decl decl env with
-                   | Some (decl, env) -> Some ((Decl decl), env)
-                   | None             -> None
-                   end
 
 let rec helper prog env =
     match prog with
     | []          -> Some []
-    | instr::prog -> begin match check_instr instr env with
-                     | Some (instr, env) -> 
+    | stmt::prog  -> begin match check_stmt stmt env with
+                     | Some (stmt, env) -> 
                          begin match helper prog env with
                          | None      -> None
-                         | Some prog -> Some (instr::prog)
+                         | Some prog -> Some (stmt::prog)
                          end
                      | None -> 
                          None
