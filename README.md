@@ -32,6 +32,7 @@ only r10-r15 are used for scratch.
 19. [ ] Generate useful errors from initialization/declaration check
 20. [ ] Comments
 21. [ ] Change print statement to book version
+22. [ ] Implement temporary variables (for arbitrary length expressions)
 
 ## Done
 1. [X] Boolean operators in codegen
