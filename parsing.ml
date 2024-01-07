@@ -44,20 +44,20 @@ let typ =
     (const (Keyword Int) IntT) <|> 
     (const (Keyword Bool) BoolT)
 
-let rec instr ts = ((
-    ((stmt >> (fun s -> Stmt s))
-<|> (decl >> (fun d -> Decl d)) 
-<|> (expr >> (fun e -> Expr e))) ++ semicolon) >> (fun (i, _) -> i)) ts
+let rec stmt ts = 
+    ((((kword Print) ++ expr) >> (fun (_, expr) -> PrintS(expr, None)))
+<|> (decl >> (fun d -> DeclS d))
+<|> (expr >> (fun e -> ExprS e))) ts
 
 and decl ts =
     (liftA6 _let id colon typ equal expr (fun _ (Id x) _ typ _ expr -> SimpDec(x, typ, expr))) ts
 
-and stmt ts =
-    ((((kword Print) ++ expr) >> (fun (_, expr) -> PrintS(expr, None)))
- <|>((id ++ equal ++ expr) >> (fun (((Id x), _), expr) -> AssS(x, expr)))) ts
-
 and expr ts =
-    or_expr ts
+    ass_expr ts
+
+and ass_expr ts =
+    ((id ++ equal ++ expr) >> (fun (((Id x), _), expr) -> AssE(x, expr))
+<|> or_expr) ts
 
 and or_expr ts =
     ((liftA3 and_expr (symbol @@ Op Or) or_expr (fun e1 _ e2 -> OpE(Or, e1, e2)))

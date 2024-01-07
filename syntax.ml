@@ -33,6 +33,7 @@ type expr =
     | NumE of int
     | OpE  of op * expr * expr
     | VarE of string
+    | AssE of string * expr
     | TrueE
     | FalseE
 
@@ -40,12 +41,8 @@ type decl =
     | SimpDec of string * typ * expr
 
 type stmt =
-    | AssS of string * expr
     | PrintS of expr * (typ option)
+    | DeclS  of decl
+    | ExprS  of expr 
 
-type instr =
-    | Expr of expr
-    | Decl of decl
-    | Stmt of stmt
-
-type prog = instr list
+type prog = stmt list

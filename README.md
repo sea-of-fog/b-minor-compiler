@@ -13,7 +13,6 @@ only r10-r15 are used for scratch.
 ## Todo
 1. [ ] Grammar: make assingment an expression
 2. [ ] Grammar: add annotations to AST
-3. [ ] Helper: stop build process on error
 4. [ ] Division operator in codegen
 5. [ ] Add modulo operator
 6. [ ] Postfix operators
@@ -45,6 +44,7 @@ only r10-r15 are used for scratch.
 7. [X] Fix bug in the compiler app
 8. [X] Add types to declarations
 9. [X] refactor parsing
+10. [X] Tool: stop build process on error
 
 ## Optional features
 1. [ ] loop breaks
