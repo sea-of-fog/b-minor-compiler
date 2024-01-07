@@ -83,6 +83,8 @@ let paren_lex str =
     else match (String.sub str 0 1) with
         | "(" -> Some ((OpenParen), suffix str)
         | ")" -> Some ((ClosedParen), suffix str)
+        | "{" -> Some ((OpenCurly), suffix str)
+        | "}" -> Some ((ClosedCurly), suffix str)
         | ";" -> Some ((SemiColon), suffix str)
         | ":" -> Some ((Colon), suffix str)
         | "=" -> Some ((Equal), suffix str)

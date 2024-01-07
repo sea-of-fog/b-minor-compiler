@@ -21,6 +21,8 @@ type token =
     | Op of op
     | OpenParen
     | ClosedParen
+    | OpenCurly
+    | ClosedCurly
     | SemiColon
     | Colon
     | Equal
