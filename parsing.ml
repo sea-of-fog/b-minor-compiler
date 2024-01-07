@@ -45,9 +45,10 @@ let typ =
     (const (Keyword Bool) BoolT)
 
 let rec stmt ts = 
-    ((((((kword Print) ++ expr) >> (fun (_, expr) -> PrintS(expr, None)))
-<|> (decl >> (fun d -> DeclS d))
-<|> (expr >> (fun e -> ExprS e))) ++ semicolon) >> ((fun (s, _) -> s))) ts
+   ((liftA3 (kword Print) expr semicolon (fun _ e _ -> PrintS(e, None)))
+<|> (liftA2 decl semicolon (fun d _ -> DeclS d))
+<|> (liftA2 expr semicolon (fun e _ -> ExprS e))
+<|> (liftA3 (symbol OpenCurly) (many stmt) (symbol ClosedCurly) (fun _ ss _ -> BlockS ss))) ts
 
 and decl ts =
     (liftA6 _let id colon typ equal expr (fun _ (Id x) _ typ _ expr -> SimpDec(x, typ, expr))) ts
