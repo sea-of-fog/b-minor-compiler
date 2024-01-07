@@ -11,29 +11,28 @@ When generating expressions, rbx and r9 are ALWAYS kept free,
 only r10-r15 are used for scratch.
 
 ## Todo
-1. [X] Grammar: make assingment an expression
-2. [ ] Grammar: add annotations to AST
-4. [ ] Division operator in codegen
-5. [ ] Add modulo operator
-6. [ ] Postfix operators
-7. [ ] Add unit tests
-8. [ ] Boolean not operator
-9. [ ] Better assembly formatting
-10. [ ] If/else
-11. [ ] Elif
-12. [ ] Uninitialised declarations
-13. [ ] Check for initialised declarations
-14. [ ] Loops
-15. [ ] Arrays
-16. [ ] Function primitives
-17. [ ] Function declarations
-18. [ ] Constant folding/propagation
-19. [ ] Refactor lexing
-20. [ ] Generate useful errors from initialization/declaration check
-21. [ ] Make typechecker monadic
-22. [ ] Comments
-23. [ ] Code blocks
-24. [ ] Change print statement to book version
+1. [ ] Grammar: add annotations to AST
+2. [ ] Division operator in codegen
+3. [ ] Add modulo operator
+4. [ ] Postfix operators
+5. [ ] Add unit tests
+6. [ ] Boolean not operator
+7. [ ] Better assembly formatting
+8. [ ] If/else
+9. [ ] Elif
+10. [ ] Uninitialised declarations
+11. [ ] Check for initialised declarations
+12. [ ] Loops
+13. [ ] Arrays
+14. [ ] Function primitives
+15. [ ] Function declarations
+16. [ ] Constant folding/propagation
+17. [ ] Refactor lexing
+18. [ ] Generate useful errors from initialization/declaration check
+19. [ ] Make typechecker monadic
+20. [ ] Comments
+21. [ ] Code blocks
+22. [ ] Change print statement to book version
 
 ## Done
 1. [X] Boolean operators in codegen
@@ -46,6 +45,7 @@ only r10-r15 are used for scratch.
 8. [X] Add types to declarations
 9. [X] refactor parsing
 10. [X] Tool: stop build process on error
+11. [X] Grammar: make assingment an expression
 
 ## Optional features
 1. [ ] loop breaks
