@@ -44,10 +44,10 @@ let typ =
     (const (Keyword Int) IntT) <|> 
     (const (Keyword Bool) BoolT)
 
-let rec instr ts =
-    (((expr >> (fun e -> Expr e)) 
-    <|> (stmt >> (fun s -> Stmt s))
-    <|> (decl >> (fun d -> Decl d))) ++ semicolon) ts
+let rec instr ts = ((
+    ((stmt >> (fun s -> Stmt s))
+<|> (decl >> (fun d -> Decl d)) 
+<|> (expr >> (fun e -> Expr e))) ++ semicolon) >> (fun (i, _) -> i)) ts
 
 and decl ts =
     (liftA6 _let id colon typ equal expr (fun _ (Id x) _ typ _ expr -> SimpDec(x, typ, expr))) ts

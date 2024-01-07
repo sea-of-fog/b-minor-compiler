@@ -5,9 +5,9 @@ type 'a pars = token list -> ('a * token list) option
 let eps (res : 'a) : 'a pars =
     (fun ts -> Some (res, ts))
 
-let const (t : token) (res : 'a) : 'a pars = function
-    | t::ts -> Some(res, ts)
-    | _     -> None
+let const t res = function
+    | tok::ts when tok = t -> Some (res, ts)
+    | _                    -> None
 
 let kword kw = 
     const (Keyword kw) (Keyword kw)

@@ -8,6 +8,7 @@ val symbol  : token -> token pars
 val kword   : keyword -> token pars
 val (<|>)   : 'a pars -> 'a pars -> 'a pars
 val (++)    : 'a pars -> 'b pars -> ('a * 'b) pars
+val (>>)    : 'a pars -> ('a -> 'b) -> 'b pars
 val many    : 'a pars -> ('a list) pars
 val liftA2  : 'a pars -> 'b pars -> ('a -> 'b -> 'c) -> 'c pars
 val liftA3  : 'a pars -> 'b pars -> 'c pars -> ('a -> 'b -> 'c -> 'd) -> 'd pars
