@@ -32,8 +32,10 @@ let scoped_prog =
 
 let typed_prog =
     match Type.check scoped_prog with
-    | Some prog -> prog
-    | None      -> failwith "type error"
+    | TypeTable.Ok typed_prog ->
+        typed_prog
+    | TypeTable.Fail msg ->
+        failwith "msg"
 
 let target_code = X86Codegen.program_codegen typed_prog
 

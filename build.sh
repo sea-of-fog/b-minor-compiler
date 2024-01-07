@@ -47,6 +47,12 @@ if [ $? -ne 0 ]; then
     exit $?
 fi
 
+ocamlc -c typeTable.mli
+ocamlc -c typeTable.ml
+if [ $? -ne 0 ]; then
+    echo "Type table module did not compile"
+    exit $?
+fi
 
 ocamlc -c type.mli
 ocamlc -c type.ml
