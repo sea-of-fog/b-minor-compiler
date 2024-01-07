@@ -27,6 +27,19 @@ if [ $? -ne 0 ]; then
     exit $?
 fi
 
+ocamlc -c errorStateMonad.ml
+if [ $? -ne 0 ]; then
+    echo "ErrorStateMonad did not compile"
+    exit $?
+fi
+
+ocamlc -c scopeTable.mli
+ocamlc -c scopeTable.ml
+if [ $? -ne 0 ]; then
+    echo "Scope resolver did not compile"
+    exit $?
+fi
+
 ocamlc -c scope.mli
 ocamlc -c scope.ml
 if [ $? -ne 0 ]; then
@@ -63,7 +76,7 @@ if [ $? -ne 0 ]; then
     exit $?
 fi
 
-ocamlc syntax.cmo parseLib.cmo scanner.cmo parsing.cmo type.cmo analyser.cmo diffList.cmo code.cmo x86Codegen.cmo compiler.ml -o bmc
+ocamlc syntax.cmo parseLib.cmo scanner.cmo parsing.cmo type.cmo errorStateMonad.cmo scopeTable.cmo scope.cmo diffList.cmo code.cmo x86Codegen.cmo compiler.ml -o bmc
 if [ $? -ne 0 ]; then
     echo "Compiler application did not compile"
     exit $?

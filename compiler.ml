@@ -1,5 +1,7 @@
-let source_file = Sys.argv.(1)
-let output_file = Sys.argv.(2)
+let source_file = 
+    Sys.argv.(1)
+let output_file = 
+    Sys.argv.(2)
 
 let rec output_lines channel lines =
     match lines with
@@ -12,16 +14,24 @@ let read_whole_file filename =
         let s = really_input_string ch (in_channel_length ch) in
             close_in ch; s
 
-let source_code = read_whole_file source_file
+let source_code = 
+    read_whole_file source_file
 
-let ts = Scanner.main_lex source_code
+let ts = 
+    Scanner.main_lex source_code
 
-let prog = Parsing.program_parser ts
+let prog = 
+    Parsing.program_parser ts
 
-let scoped_prog = Scope.resolve prog
+let scoped_prog =
+    match Scope.resolve prog with
+    | ScopeTable.Ok scoped_prog ->
+        scoped_prog
+    | ScopeTable.Fail msg ->
+        failwith msg
 
 let typed_prog =
-    match Type.check prog with
+    match Type.check scoped_prog with
     | Some prog -> prog
     | None      -> failwith "type error"
 
