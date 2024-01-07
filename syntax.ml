@@ -49,3 +49,30 @@ type stmt =
     | BlockS of stmt list
 
 type prog = stmt list
+
+type 'a, 'b ann_expr =
+    | NumAE   of 'a * int
+    | OpAE    of 'a * op * expr * expr
+    | VarAE   of 'a * 'b
+    | AssAE   of 'a * string * expr
+    | TrueAE  of 'a
+    | FalseAE of 'a
+
+type 'b, 'c ann_decl =
+    | SimpADec of 'c * typ * ('b, 'c ann_expr)
+
+(* annotated statements: variables for block data, expression data, memory representation *)
+type 'a, 'b, 'c ann_stmt =
+    | PrintS of 'b, 'c ann_expr 
+    | DeclS  of 'c ann_decl
+    | ExprS  of 'b, 'c expr 
+    | BlockS of 'a * ('a, 'b, 'c stmt) list
+
+type 'a, 'b, 'c ann_prog =
+    'a, 'b, 'c ann_stmt list
+    
+type location =
+    | Global of string
+    | Local  of { scope : int;
+                  pos   : int
+                }
