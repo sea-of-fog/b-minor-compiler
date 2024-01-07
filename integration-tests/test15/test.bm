@@ -1,0 +1,5 @@
+{
+    let alfa : int = 20;
+    let beta : bool = false;
+    let alfa : bool = 30;
+}
