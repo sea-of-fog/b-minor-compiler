@@ -2,6 +2,9 @@
 
 ocamlc -c syntax.ml
 
+ocamlc -c parseLib.mli
+ocamlc -c parseLib.ml
+
 ocamlc -c scanner.mli
 ocamlc -c scanner.ml
 
@@ -23,6 +26,6 @@ ocamlc -c diffList.cmo code.ml
 ocamlc -c x86Codegen.mli
 ocamlc code.cmo -c x86Codegen.ml
 
-ocamlc syntax.cmo scanner.cmo parsing.cmo type.cmo analyser.cmo diffList.cmo code.cmo x86Codegen.cmo compiler.ml -o bmc
+ocamlc syntax.cmo parseLib.cmo scanner.cmo parsing.cmo type.cmo analyser.cmo diffList.cmo code.cmo x86Codegen.cmo compiler.ml -o bmc
 gcc -c runtime.c
 chmod +x bmc

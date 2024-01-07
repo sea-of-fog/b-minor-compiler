@@ -6,13 +6,29 @@ let number : (Syntax.expr ParseLib.pars) =
     | (Number n)::ts -> Some (NumE n, ts)
     | _              -> None
 
-let add ts =
+let id = function
+    | (Id x)::ts -> Some ((Id x), ts)
+    | _          -> None
+
+let _let =
+    symbol (Keyword Let)
+
+let colon = 
+    symbol Colon
+
+let semicolon = 
+    symbol SemiColon
+
+let equal = 
+    symbol Equal
+
+let add =
     const (Op Add) Add
 
 let sub =
     const (Op Sub) Sub
 
-let mul ts =
+let mul =
     const (Op Mul) Mul
 
 let div =
@@ -24,7 +40,23 @@ let open_paren =
 let closed_paren =
     const ClosedParen ()
 
-let rec expr ts =
+let typ =
+    (const (Keyword Int) IntT) <|> 
+    (const (Keyword Bool) BoolT)
+
+let rec instr ts =
+    (((expr >> (fun e -> Expr e)) 
+    <|> (stmt >> (fun s -> Stmt s))
+    <|> (decl >> (fun d -> Decl d))) ++ semicolon) ts
+
+and decl ts =
+    (liftA6 _let id colon typ equal expr (fun _ (Id x) _ typ _ expr -> SimpDec(x, typ, expr))) ts
+
+and stmt ts =
+    ((((kword Print) ++ expr) >> (fun (_, expr) -> PrintS(expr, None)))
+ <|>((id ++ equal ++ expr) >> (fun (((Id x), _), expr) -> AssS(x, expr)))) ts
+
+and expr ts =
     ((term ++ expr_prime) >> (fun (e, k) -> k e)) ts
 
 and expr_prime ts =
@@ -42,4 +74,12 @@ and term_prime ts =
 
 and atom ts =
     (number 
- <|>((open_paren ++ expr ++ closed_paren) >> (fun ((_, (e : expr)), _) -> e))) ts
+ <|>((open_paren ++ expr ++ closed_paren) >> (fun ((_, (e : expr)), _) -> e))
+ <|>(id >> (fun (Id x) -> (VarE x)))) ts
+
+let program : (prog pars)  = many instr
+
+let program_parser ts =
+    match program ts with
+    | Some (prog, rest) -> prog
+    | _                 -> failwith "could not parse program"
