@@ -46,5 +46,6 @@ type stmt =
     | PrintS of expr * (typ option)
     | DeclS  of decl
     | ExprS  of expr 
+    | BlockS of stmt list
 
 type prog = stmt list
