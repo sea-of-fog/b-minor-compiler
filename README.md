@@ -1,7 +1,7 @@
 # B-minor compiler
 
 ## Changes to the language
-1. The compiler is named *bmc*
+1. The compiler is named bmc*
 2. The extension for B- files is *.bm*
 3. Declarations use let - that's easier to parse
 4. Booleans are encoded as $0 or $(-1)
@@ -9,6 +9,9 @@
 ## Register policy on X86_64
 When generating expressions, rbx and r9 are ALWAYS kept free,
 only r10-r15 are used for scratch.
+
+## Scoping
+Each code block allocates its own local variables on the stack. Therefore, the stack can change during one function call.
 
 ## Todo
 1. [ ] Division operator in codegen
@@ -55,6 +58,7 @@ only r10-r15 are used for scratch.
 ## Optional features
 1. [ ] loop breaks
 2. [ ] function inlining
+3. [ ] static local variables
 
 ## Things to test
 1. [X] Am I allocating registers correctly? Should they not be freed?
