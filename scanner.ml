@@ -13,19 +13,24 @@ let digits = [0;1;2;3;4;5;6;7;8;9]
 let digit_strings = List.map string_of_int digits
 
 (* conjuction of predicates *)
-let (&&&) p1 p2 = fun x -> (p1 x) && (p2 x)
+let (&&&) p1 p2 = 
+    fun x -> (p1 x) && (p2 x)
 
 let lowercase_letter c =
     (97 <= (Char.code c)) && ((Char.code c) <= 122)
 
-let suffix_from from str = (String.sub str from (String.length str - from))
-let suffix str = suffix_from 1 str
+let suffix_from from str = 
+    (String.sub str from (String.length str - from))
 
-let letter_lex str = if (String.length str = 0)
-                        then None
-                        else if lowercase_letter str.[0]
-                            then (Some ((String.sub str 0 1), suffix str)) 
-                            else None
+let suffix str = 
+    suffix_from 1 str
+
+let letter_lex str = 
+    if (String.length str = 0)
+    then None
+    else if lowercase_letter str.[0]
+        then (Some ((String.sub str 0 1), suffix str)) 
+        else None
 
 let rec id_lex_list str acc =
     match (letter_lex str) with
@@ -34,22 +39,25 @@ let rec id_lex_list str acc =
 
 let id_lex str =
     match (id_lex_list str []) with
-    | ([], s) -> None
-    | (ls, s) -> begin match String.concat "" (List.rev ls) with
-                 | "let"    -> Some (Keyword Let, s)
-                 | "print"  -> Some (Keyword Print, s)
-                 | "true"   -> Some (Keyword True, s)
-                 | "false"  -> Some (Keyword False, s)
-                 | "int"    -> Some (Keyword Int, s)
-                 | "bool"   -> Some (Keyword Bool, s)
-                 | id       -> Some (Id id, s)
-                 end
+    | ([], s) -> 
+        None
+    | (ls, s) -> 
+        begin match String.concat "" (List.rev ls) with
+        | "let"    -> Some (Keyword Let, s)
+        | "print"  -> Some (Keyword Print, s)
+        | "true"   -> Some (Keyword True, s)
+        | "false"  -> Some (Keyword False, s)
+        | "int"    -> Some (Keyword Int, s)
+        | "bool"   -> Some (Keyword Bool, s)
+        | id       -> Some (Id id, s)
+        end
 
-let digit_lex str = if (String.length str = 0)
-                        then None
-                        else if (List.mem (String.sub str 0 1) digit_strings)
-                            then (Some ((String.sub str 0 1) , suffix str) ) 
-                            else None
+let digit_lex str = 
+    if (String.length str = 0)
+    then None
+    else if (List.mem (String.sub str 0 1) digit_strings)
+        then (Some ((String.sub str 0 1) , suffix str) ) 
+        else None
 
 let rec number_lex_list str acc =
     match (digit_lex str) with
@@ -58,8 +66,10 @@ let rec number_lex_list str acc =
 
 let number_lex str =
     match (number_lex_list str []) with
-    | ([], s) -> None
-    | (ds, s) -> Some ((Number (int_of_string (String.concat "" (List.rev ds)))), s)
+    | ([], s) -> 
+        None
+    | (ds, s) -> 
+        Some ((Number (int_of_string (String.concat "" (List.rev ds)))), s)
 
 let operator_lex str =
     if (String.length str = 0)
