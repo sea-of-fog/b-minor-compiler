@@ -2,7 +2,13 @@ open Syntax
 open TypeTable
 
 let extract_type exp =
-    failwith "not implemented"
+    match exp with
+    | NumAE _                 -> IntT
+    | TrueAE _                -> BoolT
+    | FalseAE _               -> BoolT
+    | VarAE (_, typ)          -> typ
+    | OpAE((_, typ), _, _, _) -> typ 
+    | AssAE((_, typ), _)      -> typ 
 
 let string_of_type typ =
     match typ with
@@ -43,7 +49,6 @@ and infer_expr exp =
         let* expected_type = lookup loc in
             let* ann_exp = check_expr expected_type exp in
                 return @@ AssAE((loc, expected_type), ann_exp)
-
 
 let infer_decl decl =
     match decl with

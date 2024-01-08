@@ -25,13 +25,21 @@ let scratch_alloc table =
                                          | Some x -> Some true)
                                table)
 
+let adress loc = 
+    match loc with
+    | Global id ->
+        "["^id^"]"
+    | Local 
+
 (* zwraca kod, tablicę oraz rejestr, w którym jest wynik wyrażenia *) 
 let rec expr_codegen (exp : Syntax.expr) table : (Code.t * table * string)=
     match exp with
-    | VarE(id) -> let free, new_table = scratch_alloc table in
-                    (Code.single_line ("MOVQ ["^id^"], "^free),
-                    new_table,
-                    free)
+    | VarE(loc, _) -> 
+        let free, new_table = scratch_alloc table in
+            let loc = deref loc in
+               (Code.single_line ("MOVQ "^loc^", "^free),
+                new_table,
+                free)
     | NumE(n) -> let free, new_table = scratch_alloc table
                  in (Code.single_line ("MOVQ $"^(string_of_int n)^", "^free),
                      new_table,
