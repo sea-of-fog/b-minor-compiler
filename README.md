@@ -34,6 +34,7 @@ only r10-r15 are used for scratch.
 21. [ ] Comments
 22. [ ] Change print statement to book version
 23. [ ] Implement temporary variables (for arbitrary length expressions)
+24. [ ] Unify interface for traversing ast with state; maybe Traversable from haskell?
 
 ## Done
 1. [X] Boolean operators in codegen
