@@ -10,11 +10,11 @@ type block_data =
 let rec resolve_expr expr = 
     match expr with
     | NumE n -> 
-        return @@ NumAE (Temp, n) 
+        return @@ NumAE (TempLoc, n) 
     | OpE (op, e1, e2) ->
         let* ann_e1 = resolve_expr e1 in
             let* ann_e2 = resolve_expr e2 in
-                return @@ OpAE (Temp, op, ann_e1, ann_e2)
+                return @@ OpAE (TempLoc, op, ann_e1, ann_e2)
     | VarE id -> 
         let* location = lookup id in
             return @@ VarAE location
@@ -23,9 +23,9 @@ let rec resolve_expr expr =
             let* ann_e = resolve_expr e in
                 return @@ AssAE (location, ann_e)
     | TrueE -> 
-        return @@ TrueAE Temp
+        return @@ TrueAE TempLoc
     | FalseE ->
-        return @@ FalseAE Temp
+        return @@ FalseAE TempLoc
 
 let resolve_decl decl =
     match decl with

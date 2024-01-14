@@ -51,7 +51,7 @@ let add_to_current_scope id =
                                 current_scope_size = 1 + state.current_scope_size;
                                 label_num = state.label_num
                               } in
-                    return @@ Global id
+                    return @@ GlobalLoc id
             | true ->
                 fail @@ "variable \""^id^"\" is already bound in current (global) scope"
             end
@@ -64,7 +64,7 @@ let add_to_current_scope id =
                                     current_scope_size = pos;
                                     label_num = state.label_num
                                   } in
-                        return @@ Local { scope = 0; pos = pos}
+                        return @@ LocalLoc { scope = 0; pos = pos}
             | Some _ ->
                 fail @@ "variable \""^id^"\" is already bound in current (local) scope"
             end
@@ -121,15 +121,15 @@ let rec local_lookup id (stack : env list) : location option =
     | env::rest ->
         begin match List.assoc_opt id env with
         | Some ind ->
-          Some (Local { pos = List.length env - ind;
+          Some (LocalLoc { pos = List.length env - ind;
             scope = 0
           })
         | None ->
             begin match local_lookup id rest with
             | None ->
                 None
-            | Some (Local { pos; scope }) ->
-                Some (Local { pos; scope = scope + 1 })
+            | Some (LocalLoc { pos; scope }) ->
+                Some (LocalLoc { pos; scope = scope + 1 })
             end
         end
 
@@ -141,7 +141,7 @@ let lookup id =
             | false ->
                 fail @@ "unbound variable \""^id^"\"" 
             | true ->
-                return @@ Global id
+                return @@ GlobalLoc id
             end
         | Some location ->
             return location
