@@ -80,3 +80,17 @@ type location =
 type block_data = 
     { name : string;
       local_vars : int }
+
+type register =
+    | R10
+    | R11
+    | R12
+    | R13
+    | R14
+    | R15
+
+type memory =
+    | Global of string
+    | Register of register
+    | RspUp of int
+
