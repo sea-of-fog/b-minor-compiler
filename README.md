@@ -11,7 +11,7 @@ When generating expressions, rbx and r9 are ALWAYS kept free,
 only r10-r15 are used for scratch.
 
 ## Scoping
-Each code block allocates its own local variables on the stack. Therefore, the stack can change during one function call.
+Each code block allocates its own local variables on the stack. Therefore, the stack can change during one function call. The number of local variables is the same for the whole block.
 
 ## Todo
 1. [ ] Division operator in codegen
