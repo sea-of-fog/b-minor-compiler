@@ -14,30 +14,31 @@ only r10-r15 are used for scratch.
 Each code block allocates its own local variables on the stack. Therefore, the stack can change during one function call. The number of local variables is the same for the whole block.
 
 ## Todo
-1. [ ] Division operator in codegen
-2. [ ] Negative numbers!
-3. [ ] Add modulo operator
-4. [ ] Postfix operators
-5. [ ] Add unit tests
-6. [ ] Boolean not operator
-7. [ ] Comparison operators
-8. [ ] Remove scoping opening/closing from typechecker
-9. [ ] Better assembly formatting
-10. [ ] If/else
-11. [ ] Elif
-12. [ ] Uninitialised declarations
-13. [ ] Check for initialised declarations
-14. [ ] Loops
-15. [ ] Arrays
-16. [ ] Function primitives
-17. [ ] Function declarations
-18. [ ] Constant folding/propagation
-19. [ ] Refactor lexing
-20. [ ] Generate useful errors from initialization/declaration check
-21. [ ] Comments
-22. [ ] Change print statement to book version
-23. [ ] Implement temporary variables (for arbitrary length expressions)
-24. [ ] Unify interface for traversing ast with state; maybe Traversable from haskell?
+1. [ ] Erase the "type" parameter from declaration - it'll have it anyway!
+2. [ ] Division operator in codegen
+3. [ ] Negative numbers!
+4. [ ] Add modulo operator
+5. [ ] Postfix operators
+6. [ ] Add unit tests
+7. [ ] Boolean not operator
+8. [ ] Comparison operators
+9. [ ] Remove scoping opening/closing from typechecker
+10. [ ] Better assembly formatting
+11. [ ] If/else
+12. [ ] Elif
+13. [ ] Uninitialised declarations
+14. [ ] Check for initialised declarations
+15. [ ] Loops
+16. [ ] Arrays
+17. [ ] Function primitives
+18. [ ] Function declarations
+19. [ ] Constant folding/propagation
+20. [ ] Refactor lexing
+21. [ ] Generate useful errors from initialization/declaration check
+22. [ ] Comments
+23. [ ] Change print statement to book version
+24. [ ] Implement temporary variables (for arbitrary length expressions)
+25. [ ] Unify interface for traversing ast with state; maybe Traversable from haskell?
 
 ## Done
 1. [X] Boolean operators in codegen

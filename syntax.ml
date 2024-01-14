@@ -71,11 +71,11 @@ type ('a, 'b) ann_prog =
     ('a, 'b) ann_stmt list
     
 type location =
-    | Global of string
-    | Local  of { scope : int;
+    | GlobalLoc of string
+    | LocalLoc  of { scope : int;
                   pos   : int
                 }
-    | Temp
+    | TempLoc
 
 type block_data = 
     { name : string;
@@ -90,7 +90,7 @@ type register =
     | R15
 
 type memory =
-    | Global of string
-    | Register of register
-    | RspUp of int
-
+    | GlobalMem    of string
+    | RegisterMem  of register
+    | LocalMem     of int
+    | TempMem      of int

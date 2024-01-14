@@ -1,2 +1,2 @@
-val generate_adresses : (Scope.block_data, Addressing.memory * Syntax.typ) Syntax.ann_prog -> 
-    (Scope.block_data, string * Syntax.typ) Syntax.ann_prog
+val generate_adresses : (Scope.block_data, Syntax.location * Syntax.typ) Syntax.ann_prog -> 
+                        (Scope.block_data, Syntax.memory * Syntax.typ) Syntax.ann_prog

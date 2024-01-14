@@ -27,18 +27,18 @@ let extract_location exp =
 
 let alloc_expr exp =
     match exp with
-    | NumAE(loc, n) ->
+    | NumAE((loc, typ), n) ->
         let* new_loc = alloc loc in
-            return @@ NumAE(new_loc, n)
-    | VarAE(loc) ->
+            return @@ NumAE((new_loc, typ), n)
+    | VarAE((loc, typ)) ->
         let* new_loc = alloc loc in
-            return @@ VarAE(new_loc)
-    | OpAE(loc, e1, e2) ->
+            return @@ VarAE((new_loc, typ))
+    | OpAE((loc, typ), e1, e2) ->
         let* all_e1 = alloc_expr e2 in
             let* all_e2 = alloc_expr e2 in
                 let (loc1, loc2) = (extract_location all_e1, extract_location all_e2) in
                     let* () = free loc2 in
-                        return @@ OpAE(loc1, all_e1, all_e2)
+                        return @@ OpAE((loc1, typ), all_e1, all_e2)
     | AssAE(loc, e) ->
         let* all_e = alloc_expr e in
             let* new_loc = alloc loc in
@@ -50,11 +50,24 @@ let alloc_expr exp =
         let* new_loc = alloc loc in
             return @@ FalseAE(new_loc)
 
-let generate_decl =
-    failwith "not implemented"
+let alloc_decl decl =
+    match decl with
+    | SimpADec((loc, typ1), typ2, exp) ->
+        let* ann_exp = alloc_expr exp in
+            let* loc = alloc loc in
+                return @@ SimpADec((loc, typ1), typ2, exp)
 
-let generate_stmt =
-    failwith "not implemented"
+
+let alloc_stmt stmt =
+    match stmt with
+    | ExprAS e -> 
+        alloc_expr e
+    | DeclAS d -> 
+        alloc_decl d
+    | PrintAS e -> 
+        let* all_e = alloc_expr e in
+            return @@ PrintAS all_e         
+    | BlockSS(b, ss) ->
 
 let generate_prog prog = 
     match prog with
