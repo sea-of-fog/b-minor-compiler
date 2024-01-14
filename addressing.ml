@@ -41,7 +41,6 @@ let alloc_decl decl =
             let* loc = alloc loc in
                 return @@ SimpADec((loc, typ1), typ2, exp)
 
-
 let alloc_stmt stmt =
     match stmt with
     | ExprAS e -> 
