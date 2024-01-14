@@ -1,19 +1,3 @@
-(* type my_state = *) 
-(*     { scope_stack = int list; *)
-(*       temp_stack  = int list; *)
-(*       temps       = int; *)
-(*       busy_registers = register list; *)
-(*       free_register  = register list *)
-(*     } *)
-
-(* let rec compute_offset scope_stack scope pos = *)
-(*     match scope_stack with *)
-(*     | size::rest -> *)
-(*         if scope = 0 *)
-(*         (1* look out for this +- 1 *1) *)
-(*         then size - pos + 1 *)
-(*         else size + compute_offset rest (scope - 1) pos *)
-
 open AddressTable
 
 let extract_location exp =
@@ -67,7 +51,11 @@ let alloc_stmt stmt =
     | PrintAS e -> 
         let* all_e = alloc_expr e in
             return @@ PrintAS all_e         
-    | BlockSS(b, ss) ->
+    | BlockSS(b, ss) -> 
+        let* () = open_scope b in
+            let* alloc_ss = generate_prog ss in
+                let* new_block_data = close_scope in
+                    return @@ BlockSS(new_block_data, alloc_ss)
 
 let generate_prog prog = 
     match prog with
