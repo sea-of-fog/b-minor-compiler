@@ -82,6 +82,8 @@ type block_data =
       local_vars : int }
 
 type register =
+    | RBX
+    | R09
     | R10
     | R11
     | R12
