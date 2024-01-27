@@ -61,6 +61,26 @@ if [ $? -ne 0 ]; then
     exit $?
 fi
 
+ocamlc -c stateMonad.ml
+if [ $? -ne 0 ]; then
+    echo "StateMonad did not compile"
+    exit $?
+fi
+
+ocamlc -c adressTable.mli
+ocamlc -c adressTable.ml
+if [ $? -ne 0 ]; then
+    echo "Addressing helper module did not compile"
+    exit $?
+fi
+
+ocamlc -c addressing.mli
+ocamlc -c addressing.ml
+if [ $? -ne 0 ]; then
+    echo "Addressing module did not compile"
+    exit $?
+fi
+
 ocamlc -c diffList.mli
 ocamlc -c diffList.ml
 if [ $? -ne 0 ]; then
@@ -82,7 +102,7 @@ if [ $? -ne 0 ]; then
     exit $?
 fi
 
-ocamlc syntax.cmo parseLib.cmo scanner.cmo parsing.cmo type.cmo errorStateMonad.cmo scopeTable.cmo scope.cmo diffList.cmo code.cmo x86Codegen.cmo compiler.ml -o bmc
+ocamlc syntax.cmo parseLib.cmo scanner.cmo parsing.cmo type.cmo errorStateMonad.cmo scopeTable.cmo scope.cmo stateMonad.cmo addressTable.cmo addressing.cmo diffList.cmo code.cmo x86Codegen.cmo compiler.ml -o bmc
 if [ $? -ne 0 ]; then
     echo "Compiler application did not compile"
     exit $?
