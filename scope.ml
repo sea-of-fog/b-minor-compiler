@@ -1,11 +1,7 @@
-open Syntax
 open ScopeTable
+open Syntax
 
 (* This module checks if every variable used has already been declared *)
-
-type block_data = 
-    { label : string;
-      local_vars : int }
 
 let rec resolve_expr expr = 
     match expr with

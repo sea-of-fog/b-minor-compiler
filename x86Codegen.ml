@@ -3,11 +3,22 @@ open Syntax
 let extract_location =
     Addressing.extract_location
 
-let resolve mem =
-    failwith "not implemented"
+(* watch out whether stack offsets start from 0 or 1! *)
+let resolve = function
+    | RegisterMem r -> resolve_reg r
+    | GlobalMem id  -> "["^id^"]"
+    | LocalMem ind  -> "-"^(8*ind)^"(%rbp)"
+    | TempMem ind   -> "-"^(8*ind)^"(%rbp)"
 
-let resolve_reg r =
-    resolve (RegisterMem r)
+let resolve_reg = function
+    | RBX -> "%rbx"
+    | R09 -> "%r09"
+    | R10 -> "%r10"
+    | R11 -> "%r11"
+    | R12 -> "%r12"
+    | R13 -> "%r13"
+    | R14 -> "%r14"
+    | R15 -> "%r15"
 
 let move_const mem n =
     Code.single_line ("MOVQ $("^(string_of_int n)^"), "^(resolve mem))
@@ -41,28 +52,17 @@ let generic_operator instr exp1 exp2 tgt =
         end
 
 let rec expr_codegen exp = function
-    | NumAE((mem, _), n) ->
-        move_const mem n
-    | VarAE(mem, _) ->
-        Code.empty
-    | TrueAE(mem, _) ->
-        move_const mem (-1)
-    | FalseAE(mem, _) ->
-        move_const mem 0
-    | OpAE((mem, _), Add, exp1, exp2) ->
-        generic_operator "ADDQ" exp1 exp2 mem
-    | OpAE((mem, _), Sub, exp1, exp2) ->
-        generic_operator "SUBQ" exp1 exp2 mem
-    | OpAE((mem, _), And, exp1, exp2) ->
-        generic_operator "ANDQ" exp1 exp2 mem
-    | OpAE((mem, _), Or, exp1, exp2) ->
-        generic_operator "ORQ " exp1 exp2 mem
-    | OpAE((mem, _), Mul, exp1, exp2) ->
-        failwith "not implemented"
-    | OpAE((mem, _), Div, exp1, exp2) ->
-        failwith "not implemented"
-    | AssAE((mem, _), exp) ->
-        move mem (extract_location exp)
+    | NumAE((mem, _), n)                -> move_const mem n
+    | VarAE(mem, _)                     -> Code.empty
+    | TrueAE(mem, _)                    -> move_const mem (-1)
+    | FalseAE(mem, _)                   -> move_const mem 0
+    | OpAE((mem, _), Add, exp1, exp2)   -> generic_operator "ADDQ" exp1 exp2 mem
+    | OpAE((mem, _), Sub, exp1, exp2)   -> generic_operator "SUBQ" exp1 exp2 mem
+    | OpAE((mem, _), And, exp1, exp2)   -> generic_operator "ANDQ" exp1 exp2 mem
+    | OpAE((mem, _), Or, exp1, exp2)    -> generic_operator "ORQ " exp1 exp2 mem
+    | OpAE((mem, _), Mul, exp1, exp2)   -> failwith "not implemented"
+    | OpAE((mem, _), Div, exp1, exp2)   -> failwith "not implemented"
+    | AssAE((mem, _), exp)              -> move mem (extract_location exp)
 
 let decl_codegen decl =
     match decl with
@@ -71,10 +71,11 @@ let decl_codegen decl =
 
 let stmt_codegen (stmt : Syntax.stmt) : Code.t =
     match stmt with
-    | DeclS decl -> decl_codegen decl
-    | ExprS exp   -> let (code, _, _) = expr_codegen exp scratch_table in
-                        code 
-    | PrintS(exp, Some typ) -> 
+    | DeclAS decl -> 
+        decl_codegen decl
+    | ExprAS exp ->
+        expr_codegen exp
+    | PrintAS(exp, Some typ) -> 
         begin match typ with
         | IntT ->
             let (exp_code, _, res_register) = expr_codegen exp scratch_table in
@@ -97,8 +98,12 @@ let stmt_codegen (stmt : Syntax.stmt) : Code.t =
                 |> Code.add_line "POPQ  %r11";
                 |> Code.add_line "POPQ  %r10"
         end
+    | BlockAS bdata ss ->
+        Code.single_line (bdata.name^":")
+        |> Code.add @@ prog_codegen_helper ss Code.empty
+(* FIXME: add escape labels! *)
 
-let rec prog_codegen_helper (prog : Syntax.prog) (acc : Code.t) : Code.t =
+let rec prog_codegen_helper prog acc : Code.t =
     match prog with
     | stmt::rest -> let code = stmt_codegen stmt in
                         prog_codegen_helper rest (Code.concat acc code)

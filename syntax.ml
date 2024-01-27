@@ -78,7 +78,7 @@ type location =
     | TempLoc
 
 type block_data = 
-    { name : string;
+    { label : string;
       local_vars : int }
 
 type register =
