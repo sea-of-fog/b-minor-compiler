@@ -1,57 +1,23 @@
 open Syntax
 
-module M = Map.Make(String)
-type table = bool Map.Make(String).t
+let resolve mem =
+    failwith "not implemented"
 
-let scratch_table =
-    [("%r10", false); ("%r11", false); ("%r12", false); ("%r13", false); ("%r14", false); ("%r15", false)]
-    |> List.to_seq
-    |> M.of_seq
+let move_const mem n =
+    Code.add_line ("MOVQ ")
 
-let scratch_free reg_name table =
-    let f x = match x with
-              | None -> None
-              | Some b -> Some false
-        in M.update reg_name f table
+let rec expr_codegen exp = function
+    | NumAE((mem, _), n) ->
+        move_const mem n
+    | VarAE(mem, _) ->
+        Code.Nil
+    | TrueAE(mem, _) ->
+        move_const mem (-1)
+    | FalseAE(mem, _) ->
+        move_const mem 0
 
-let scratch_alloc table =
-    let free_reg = table
-                   |> M.filter (fun _ x -> not x)
-                   |> M.min_binding
-                   |> fst
-        in (free_reg, M.update free_reg
-                               (fun x -> match x with
-                                         | None -> None
-                                         | Some x -> Some true)
-                               table)
-
-let adress loc = 
-    match loc with
-    | Global id ->
-        "["^id^"]"
-    | Local 
-
-(* zwraca kod, tablicę oraz rejestr, w którym jest wynik wyrażenia *) 
 let rec expr_codegen (exp : Syntax.expr) table : (Code.t * table * string)=
     match exp with
-    | VarE(loc, _) -> 
-        let free, new_table = scratch_alloc table in
-            let loc = deref loc in
-               (Code.single_line ("MOVQ "^loc^", "^free),
-                new_table,
-                free)
-    | NumE(n) -> let free, new_table = scratch_alloc table
-                 in (Code.single_line ("MOVQ $"^(string_of_int n)^", "^free),
-                     new_table,
-                     free)
-    | TrueE -> let free, new_table = scratch_alloc table
-                 in (Code.single_line ("MOVQ $(-1), "^free),
-                     new_table,
-                     free)
-    | FalseE -> let free, new_table = scratch_alloc table
-                 in (Code.single_line ("MOVQ $0, "^free),
-                     new_table,
-                     free)
     | OpE(Add, exp1, exp2) -> let left_code, left_table, left_res = expr_codegen exp1 table in
                               let right_code, right_table, right_res = expr_codegen exp2 left_table in
                               ( Code.concat left_code right_code
