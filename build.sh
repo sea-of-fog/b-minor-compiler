@@ -67,8 +67,8 @@ if [ $? -ne 0 ]; then
     exit $?
 fi
 
-ocamlc -c adressTable.mli
-ocamlc -c adressTable.ml
+ocamlc -c addressTable.mli
+ocamlc -c addressTable.ml
 if [ $? -ne 0 ]; then
     echo "Addressing helper module did not compile"
     exit $?
