@@ -66,7 +66,8 @@ let rec expr_codegen = function
 let decl_codegen decl =
     match decl with
     | SimpADec((mem, _), _, exp) ->
-        move (extract_location exp) mem
+        (Code.concat @@ expr_codegen exp)
+                    @@ move (extract_location exp) mem
 
 let extract_type exp =
     snd @@ Addressing.extract_data exp
@@ -123,7 +124,8 @@ let make_declarations (var_names : string list) : Code.t =
     Code.from_list (List.map (fun id -> id^": .quad 0") var_names)
     
 let prog_code prog : Code.t =
-    let var_names = prog
+    let var_names = let BlockAS(bdata, stmts)::[] = prog in
+                    stmts
                     |> List.filter is_decl
                     |> List.map extract_var_name in
     let prog_code = prog_codegen_helper prog Code.empty in
