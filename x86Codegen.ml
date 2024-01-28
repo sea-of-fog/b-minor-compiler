@@ -52,16 +52,34 @@ let generic_operator instr exp1 exp2 tgt =
         end
 
 let rec expr_codegen = function
-    | NumAE((mem, _), n)                -> move_const mem n
-    | VarAE(mem, _)                     -> Code.empty
-    | TrueAE(mem, _)                    -> move_const mem (-1)
-    | FalseAE(mem, _)                   -> move_const mem 0
-    | OpAE((mem, _), Add, exp1, exp2)   -> generic_operator "ADDQ" exp1 exp2 mem
-    | OpAE((mem, _), Sub, exp1, exp2)   -> generic_operator "SUBQ" exp1 exp2 mem
-    | OpAE((mem, _), And, exp1, exp2)   -> generic_operator "ANDQ" exp1 exp2 mem
-    | OpAE((mem, _), Or, exp1, exp2)    -> generic_operator "ORQ " exp1 exp2 mem
-    | OpAE((mem, _), Mul, exp1, exp2)   -> failwith "not implemented"
-    | OpAE((mem, _), Div, exp1, exp2)   -> failwith "not implemented"
+    | NumAE((mem, _), n) ->
+        move_const mem n
+    | VarAE(mem, _) ->
+        Code.empty
+    | TrueAE(mem, _) ->
+        move_const mem (-1)
+    | FalseAE(mem, _) ->
+        move_const mem 0
+    | OpAE((mem, _), Add, exp1, exp2) -> 
+        Code.concat (Code.concat (expr_codegen exp1)
+                                 (expr_codegen exp2))
+                    (generic_operator "ADDQ" exp1 exp2 mem)
+    | OpAE((mem, _), Sub, exp1, exp2) -> 
+        Code.concat (Code.concat (expr_codegen exp1)
+                                 (expr_codegen exp2))
+                    (generic_operator "SUBQ" exp1 exp2 mem)
+    | OpAE((mem, _), And, exp1, exp2) -> 
+        Code.concat (Code.concat (expr_codegen exp1)
+                                 (expr_codegen exp2))
+                    (generic_operator "ANDQ" exp1 exp2 mem)
+    | OpAE((mem, _), Or, exp1, exp2) -> 
+        Code.concat (Code.concat (expr_codegen exp1)
+                                 (expr_codegen exp2))
+                    (generic_operator "ORQ" exp1 exp2 mem)
+    | OpAE((mem, _), Mul, exp1, exp2) ->
+        failwith "not implemented"
+    | OpAE((mem, _), Div, exp1, exp2) ->
+        failwith "not implemented"
     | AssAE((mem, _), exp)              -> move mem (extract_location exp)
 
 let decl_codegen decl =
