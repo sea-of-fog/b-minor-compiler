@@ -43,19 +43,22 @@ let alloc_decl decl =
     match decl with
     | SimpADec((loc, typ1), typ2, exp) ->
         let* all_exp = alloc_expr exp in
-            let* loc = alloc loc in
-                return @@ SimpADec((loc, typ1), typ2, all_exp)
+        let* loc = alloc loc in
+        let* () = free @@ extract_location exp in
+            return @@ SimpADec((loc, typ1), typ2, all_exp)
 
 let rec alloc_stmt stmt =
     match stmt with
     | ExprAS e -> 
         let* all_e = alloc_expr e in
+        let* () = free @@ extract_location all_e in
             return @@ ExprAS all_e
     | DeclAS d -> 
         let* all_decl = alloc_decl d in
             return @@ DeclAS all_decl
     | PrintAS e -> 
         let* all_e = alloc_expr e in
+        let* () = free @@ extract_location all-e in
             return @@ PrintAS all_e         
     | BlockAS(b, ss) -> 
         let* () = open_scope b in
