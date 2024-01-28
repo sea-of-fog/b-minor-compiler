@@ -85,7 +85,14 @@ let rec expr_codegen = function
                      |> Code.add_line ("MOVQ %rax, "^(resolve mem))
                      |> Code.add_line "POPQ %rdx")
     | OpAE((mem, _), Div, exp1, exp2) ->
-        failwith "not implemented"
+        Code.concat (Code.concat (expr_codegen exp1)
+                                 (expr_codegen exp2))
+                    (Code.single_line "PUSHQ %rdx"
+                     |> Code.add_line ("MOVQ "^(resolve @@ extract_location exp1)^", %rax")
+                     |> Code.add_line "CQO"
+                     |> Code.add_line ("IDIVQ "^(resolve @@ extract_location exp2))
+                     |> Code.add_line ("MOVQ %rax, "^(resolve mem))
+                     |> Code.add_line "POPQ %rdx")
     | AssAE((mem, _), exp) ->
         move mem (extract_location exp)
 
