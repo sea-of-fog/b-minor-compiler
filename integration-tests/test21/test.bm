@@ -1,0 +1,12 @@
+{
+    let x:int = 86;
+    {
+        let x:int = 13;
+        print x;
+        {
+            let x:int = 27;
+            print x;
+        }
+    }
+    print x;
+}
