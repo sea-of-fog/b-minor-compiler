@@ -13,8 +13,7 @@ let extract_data exp =
 let extract_location exp =
     fst @@ extract_data exp
 
-let rec alloc_expr exp =
-    match exp with
+let rec alloc_expr = function
     | NumAE((loc, typ), n) ->
         let* address = alloc loc in
             return @@ NumAE((address, typ), n)
@@ -22,11 +21,13 @@ let rec alloc_expr exp =
         let* address = alloc loc in
             return @@ VarAE((address, typ))
     | OpAE((loc, typ), op, e1, e2) ->
-        let* all_e1 = alloc_expr e2 in
-            let* all_e2 = alloc_expr e2 in
-                let (loc1, loc2) = (extract_location all_e1, extract_location all_e2) in
-                    let* () = free loc2 in
-                        return @@ OpAE((loc1, typ), op, all_e1, all_e2)
+        let* all_e1 = alloc_expr e1 in
+        let* all_e2 = alloc_expr e2 in
+        let (loc1, loc2) = (extract_location all_e1, extract_location all_e2) in
+        let* () = free loc1 in
+        let* () = free loc2 in
+        let* new_loc = alloc loc in
+            return @@ OpAE((new_loc, typ), op, all_e1, all_e2)
     | AssAE((loc, typ), e) ->
         let* all_e = alloc_expr e in
             let* new_loc = alloc loc in

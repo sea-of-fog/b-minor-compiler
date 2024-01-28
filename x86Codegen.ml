@@ -5,7 +5,7 @@ let extract_location =
 
 let resolve_reg = function
     | RBX -> "%rbx"
-    | R09 -> "%r09"
+    | R09 -> "%r9"
     | R10 -> "%r10"
     | R11 -> "%r11"
     | R12 -> "%r12"
@@ -26,8 +26,6 @@ let move_const mem n =
 let move mem1 mem2 =
     Code.single_line ("MOVQ "^(resolve mem1)^", "^(resolve mem2))
 
-(* FIXME - żadna gałąź jeszcze nie działa *)
-(* sprawdzić, czy do dobrego rejestru idzie wynik *)
 (* Checks whether the values are already registerized,
    if not, registerizes them to rbx and r09 respectively *)
 let generic_operator instr exp1 exp2 tgt =
@@ -37,17 +35,20 @@ let generic_operator instr exp1 exp2 tgt =
         | RegisterMem r2 ->
             Code.single_line (instr^" "^(resolve_reg r1)^", "^(resolve_reg r2))
         | mem2 ->
-            move mem2 (RegisterMem RBX)
-            |> Code.add_line (instr^" "^(resolve_reg r1)^", "^(resolve_reg RBX))
+            Code.concat (move mem2 (RegisterMem RBX)
+                         |> Code.add_line (instr^" "^(resolve_reg r1)^", "^(resolve_reg RBX)))
+                        (move (RegisterMem RBX) tgt) 
         end
     | mem1 ->
         begin match extract_location exp2 with
         | RegisterMem r2 ->
-            Code.single_line (instr^" "^(resolve mem1)^", "^(resolve_reg r2))
+            move mem1 (RegisterMem RBX)
+            |> Code.add_line (instr^" "^(resolve_reg RBX)^", "^(resolve_reg r2))
         | mem2 ->
-            move mem2 (RegisterMem RBX)
-            |> Code.add_line ""
-            |> Code.add_line (instr^" "^(resolve mem1)^", "^(resolve mem2))
+            Code.concat (Code.concat (move mem1 (RegisterMem RBX))
+                                     (move mem2 (RegisterMem R09))
+                        |> Code.add_line (instr^" "^(resolve_reg RBX)^", "^(resolve_reg R09)))
+                        (move (RegisterMem R09) tgt)
         end
 
 let rec expr_codegen = function
