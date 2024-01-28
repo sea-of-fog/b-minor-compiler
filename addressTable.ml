@@ -12,7 +12,6 @@ type my_state = block_state list
 
 (* FIXME: need to do two passes with temp variables -- first generate their numbers and then resolve them *)
 (* TODO: separate name and scope stack and write "methods" to access/change them *)
-(* TODO: add getters/setters *)
 
 module State = struct
     type t = my_state

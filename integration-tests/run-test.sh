@@ -16,7 +16,7 @@ do
 
 	# build the test program
 	cd test$i
-	../../bmc test.bm test.S > err.out
+	../../bmc test.bm test.S &> err.out
 
     # check test type
     if (test -f expected.ans); then # this is a test, in which the program should compile
