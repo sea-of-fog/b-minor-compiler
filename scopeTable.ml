@@ -58,10 +58,10 @@ let add_to_current_scope id =
         | env::rest ->
             begin match List.assoc_opt id env with
             | None -> 
-                let pos = state.current_scope_size + 1 in
+                let pos = state.current_scope_size in
                     let* () = set { global_env = state.global_env;
                                     local_env_stack = ((id, pos)::env)::rest;
-                                    current_scope_size = pos;
+                                    current_scope_size = pos + 1;
                                     label_num = state.label_num
                                   } in
                         return @@ LocalLoc { scope = 0; pos = pos}
@@ -121,7 +121,7 @@ let rec local_lookup id (stack : env list) : location option =
     | env::rest ->
         begin match List.assoc_opt id env with
         | Some ind ->
-          Some (LocalLoc { pos = List.length env - ind;
+          Some (LocalLoc { pos = ind;
             scope = 0
           })
         | None ->
