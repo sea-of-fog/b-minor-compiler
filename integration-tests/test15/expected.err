@@ -1,1 +1,1 @@
-variable "alfa" already bound in current (local) scope
+Fatal error: exception Failure("variable alfa is already bound in current (local) scope")

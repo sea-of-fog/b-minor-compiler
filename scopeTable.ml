@@ -53,7 +53,7 @@ let add_to_current_scope id =
                               } in
                     return @@ GlobalLoc id
             | true ->
-                fail @@ "variable \""^id^"\" is already bound in current (global) scope"
+                fail @@ "variable "^id^" is already bound in current (global) scope"
             end
         | env::rest ->
             begin match List.assoc_opt id env with
@@ -66,7 +66,7 @@ let add_to_current_scope id =
                                   } in
                         return @@ LocalLoc { scope = 0; pos = pos}
             | Some _ ->
-                fail @@ "variable \""^id^"\" is already bound in current (local) scope"
+                fail @@ "variable "^id^" is already bound in current (local) scope"
             end
 
 let open_scope =
@@ -139,7 +139,7 @@ let lookup id =
         | None ->
             begin match List.mem id state.global_env with
             | false ->
-                fail @@ "unbound variable \""^id^"\"" 
+                fail @@ "unbound variable "^id 
             | true ->
                 return @@ GlobalLoc id
             end

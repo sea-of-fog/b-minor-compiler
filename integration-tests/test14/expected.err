@@ -1,1 +1,1 @@
-unboudn variable "x"
+Fatal error: exception Failure("unbound variable x")
