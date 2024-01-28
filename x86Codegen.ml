@@ -24,7 +24,8 @@ let move_const mem n =
     Code.single_line ("MOVQ $("^(string_of_int n)^"), "^(resolve mem))
 
 let move mem1 mem2 =
-    Code.single_line ("MOVQ "^(resolve mem1)^", "^(resolve mem2))
+    Code.single_line ("MOVQ "^(resolve mem1)^", %rax")
+    |> Code.add_line ("MOVQ %rax, "^(resolve mem2))
 
 (* Checks whether the values are already registerized,
    if not, registerizes them to rbx and r09 respectively *)
@@ -94,7 +95,8 @@ let rec expr_codegen = function
                      |> Code.add_line ("MOVQ %rax, "^(resolve mem))
                      |> Code.add_line "POPQ %rdx")
     | AssAE((mem, _), exp) ->
-        move mem (extract_location exp)
+        Code.concat (expr_codegen exp)
+                    (move (extract_location exp) mem)
 
 let decl_codegen decl =
     match decl with
