@@ -203,11 +203,16 @@ let prog_code prog : Code.t =
                     ((prog_code
                     |> Code.prefix ""
                     |> Code.prefix ("SUBQ $("^(string_of_int (8*(needed_temps + needed_local)))^"), %rsp")
+                    |> Code.prefix "MOVQ %rsp, %rbp"
+                    |> Code.prefix "PUSHQ %rbp"
                     |> Code.prefix "# allocating local and temporary variables"
                     |> Code.prefix ""
                     |> Code.prefix "main:"
                     |> Code.prefix "\t.global main"
                     |> Code.prefix ".text")
+                    |> Code.add_line "# restoring stack after main call"
+                    |> Code.add_line "MOVQ %rbp, %rsp"
+                    |> Code.add_line "POPQ %rbp"
                     |> Code.add_line "RET")
 
 let program_codegen prog =
