@@ -67,7 +67,7 @@ let rec expr_codegen = function
     | OpAE((mem, _), Sub, exp1, exp2) -> 
         Code.concat (Code.concat (expr_codegen exp1)
                                  (expr_codegen exp2))
-                    (generic_operator "SUBQ" exp1 exp2 mem)
+                    (generic_operator "SUBQ" exp2 exp1 mem)
     | OpAE((mem, _), And, exp1, exp2) -> 
         Code.concat (Code.concat (expr_codegen exp1)
                                  (expr_codegen exp2))

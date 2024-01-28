@@ -24,8 +24,8 @@ let rec alloc_expr = function
         let* all_e1 = alloc_expr e1 in
         let* all_e2 = alloc_expr e2 in
         let (loc1, loc2) = (extract_location all_e1, extract_location all_e2) in
-        let* () = free loc1 in
         let* () = free loc2 in
+        let* () = free loc1 in
         let* new_loc = alloc loc in
             return @@ OpAE((new_loc, typ), op, all_e1, all_e2)
     | AssAE((loc, typ), e) ->
