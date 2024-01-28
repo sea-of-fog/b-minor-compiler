@@ -90,13 +90,13 @@ let block_data_v2_of_state state =
       local_vars_v2 = state.locals}
 
 let open_scope block_data = 
-    let* top::rest = get in
+    let* state = get in
     let new_top = { temps = 0;
                     locals = block_data.local_vars;
                     free_temps = [];
                     free_registers = R10::R11::R12::R13::R14::R15::[];
                     name = block_data.label} in
-    set @@ new_top::top::rest
+    set @@ new_top::state
 
 let close_scope =
     let* top::rest = get in
