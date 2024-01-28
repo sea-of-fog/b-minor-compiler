@@ -3,6 +3,30 @@ open Syntax
 let extract_location =
     Addressing.extract_location
 
+let max x y =
+    if x < y then y else x
+
+let rec max_temps = function
+    | ExprAS _ ->
+        0
+    | DeclAS _ ->
+        0
+    | PrintAS _ ->
+        0
+    | BlockAS (bdata, stmts) ->
+        max bdata.temp_vars_v2
+            (List.fold_left max 0 (List.map max_temps stmts))
+
+let rec max_local = function
+    | ExprAS _ ->
+        0
+    | DeclAS _ ->
+        0
+    | PrintAS _ ->
+        0
+    | BlockAS (bdata, stmts) ->
+        bdata.local_vars_v2 + (List.fold_left max 0 (List.map max_local stmts))
+
 let resolve_reg = function
     | RBX -> "%rbx"
     | R09 -> "%r9"
@@ -143,8 +167,8 @@ let rec stmt_codegen stmt : Code.t =
                 |> Code.add_line ""
         end
     | BlockAS (bdata, ss) ->
-        Code.single_line ("."^bdata.label_v2^":")
-        |> Code.concat @@ prog_codegen_helper ss Code.empty
+        prog_codegen_helper ss Code.empty
+        |> Code.prefix ("."^bdata.label_v2^":")
 (* FIXME: add escape labels! *)
 
 and prog_codegen_helper prog acc : Code.t =
@@ -165,7 +189,10 @@ let make_declarations (var_names : string list) : Code.t =
     Code.from_list (List.map (fun id -> id^": .quad 0") var_names)
     
 let prog_code prog : Code.t =
-    let var_names = let BlockAS(bdata, stmts)::[] = prog in
+    let [global_block] = prog in
+    let needed_temps = max_temps global_block in
+    let needed_local = max_local global_block in
+    let var_names = let BlockAS(_, stmts) = global_block in
                     stmts
                     |> List.filter is_decl
                     |> List.map extract_var_name in
@@ -173,10 +200,15 @@ let prog_code prog : Code.t =
     let decl_code = make_declarations var_names in
        Code.concat  (decl_code
                     |> Code.prefix ".data\n")
-                    (Code.add_line "RET" prog_code
-                    |> Code.prefix "main: \n"
-                    |> Code.prefix "\t.global main\n"
-                    |> Code.prefix ".text\n")
+                    ((prog_code
+                    |> Code.prefix ""
+                    |> Code.prefix ("SUBQ $("^(string_of_int (8*(needed_temps + needed_local)))^"), %rsp")
+                    |> Code.prefix "# allocating local and temporary variables"
+                    |> Code.prefix ""
+                    |> Code.prefix "main:"
+                    |> Code.prefix "\t.global main"
+                    |> Code.prefix ".text")
+                    |> Code.add_line "RET")
 
 let program_codegen prog =
     Code.to_lines (prog_code prog)

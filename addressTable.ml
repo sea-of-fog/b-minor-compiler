@@ -1,7 +1,8 @@
 open Syntax
 
 type block_state = 
-    { temps          : int;
+    { local_pref     : int;
+      temps          : int;
       free_temps     : memory list;
       free_registers : register list;
       name           : string;
@@ -67,7 +68,8 @@ let alloc = function
     | GlobalLoc s ->
         return @@ GlobalMem s
     | LocalLoc { scope; pos } ->
-           return @@ LocalMem (1+pos)
+        let* state = get_top in
+        return @@ LocalMem (1 + pos + state.local_pref - state.locals)
     | TempLoc ->
         let* state = get_top in
         begin match state.free_registers with
@@ -91,12 +93,25 @@ let block_data_v2_of_state state =
 
 let open_scope block_data = 
     let* state = get in
-    let new_top = { temps = 0;
-                    locals = block_data.local_vars;
-                    free_temps = [];
-                    free_registers = R10::R11::R12::R13::R14::R15::[];
-                    name = block_data.label} in
-    set @@ new_top::state
+    (* opening global scope *)
+    match state with
+    | [] ->
+        let new_top = { local_pref = block_data.local_vars;
+                        temps = 0;
+                        locals = block_data.local_vars;
+                        free_temps = [];
+                        free_registers = R10::R11::R12::R13::R14::R15::[];
+                        name = block_data.label} in
+        set @@ new_top::state
+    (* opening local scope *)
+    | top::rest ->
+        let new_top = { local_pref = block_data.local_vars + top.local_pref;
+                        temps = 0;
+                        locals = block_data.local_vars;
+                        free_temps = [];
+                        free_registers = R10::R11::R12::R13::R14::R15::[];
+                        name = block_data.label} in
+        set @@ new_top::top::state
 
 let close_scope =
     let* top::rest = get in
