@@ -37,6 +37,7 @@ Each code block allocates its own local variables on the stack. Therefore, the s
 21. [ ] Comments
 22. [ ] Change print statement to book version
 23. [ ] Unify interface for traversing ast with state; maybe Traversable from haskell?
+24. [ ] Improve error messeages from type checking
 
 ## Done
 1. [X] Boolean operators in codegen
