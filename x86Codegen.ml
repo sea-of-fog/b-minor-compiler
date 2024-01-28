@@ -3,13 +3,6 @@ open Syntax
 let extract_location =
     Addressing.extract_location
 
-(* watch out whether stack offsets start from 0 or 1! *)
-let resolve = function
-    | RegisterMem r -> resolve_reg r
-    | GlobalMem id  -> "["^id^"]"
-    | LocalMem ind  -> "-"^(8*ind)^"(%rbp)"
-    | TempMem ind   -> "-"^(8*ind)^"(%rbp)"
-
 let resolve_reg = function
     | RBX -> "%rbx"
     | R09 -> "%r09"
@@ -19,6 +12,13 @@ let resolve_reg = function
     | R13 -> "%r13"
     | R14 -> "%r14"
     | R15 -> "%r15"
+
+(* watch out whether stack offsets start from 0 or 1! *)
+let resolve = function
+    | RegisterMem r -> resolve_reg r
+    | GlobalMem id  -> "["^id^"]"
+    | LocalMem ind  -> "-"^(string_of_int (8*ind))^"(%rbp)"
+    | TempMem ind   -> "-"^(string_of_int (8*ind))^"(%rbp)"
 
 let move_const mem n =
     Code.single_line ("MOVQ $("^(string_of_int n)^"), "^(resolve mem))
@@ -31,7 +31,6 @@ let move mem1 mem2 =
 (* Checks whether the values are already registerized,
    if not, registerizes them to rbx and r09 respectively *)
 let generic_operator instr exp1 exp2 tgt =
-    Code.suffix 
     match extract_location exp1 with
     | RegisterMem r1 ->
         begin match extract_location exp2 with
@@ -44,14 +43,14 @@ let generic_operator instr exp1 exp2 tgt =
     | mem1 ->
         begin match extract_location exp2 with
         | RegisterMem r2 ->
-            Code.single_line (instr^" "^(resolve_reg r1)^", "^(resolve_reg r2))
+            Code.single_line (instr^" "^(resolve mem1)^", "^(resolve_reg r2))
         | mem2 ->
             move mem2 (RegisterMem RBX)
-            |> Code.add_line
-            |> Code.add_line (instr^" "^(resolve_reg r1)^", "^(resolve_reg r2))
+            |> Code.add_line ""
+            |> Code.add_line (instr^" "^(resolve mem1)^", "^(resolve mem2))
         end
 
-let rec expr_codegen exp = function
+let rec expr_codegen = function
     | NumAE((mem, _), n)                -> move_const mem n
     | VarAE(mem, _)                     -> Code.empty
     | TrueAE(mem, _)                    -> move_const mem (-1)
@@ -69,18 +68,21 @@ let decl_codegen decl =
     | SimpADec((mem, _), _, exp) ->
         move (extract_location exp) mem
 
-let stmt_codegen (stmt : Syntax.stmt) : Code.t =
+let extract_type exp =
+    snd @@ Addressing.extract_data exp
+
+let rec stmt_codegen stmt : Code.t =
     match stmt with
     | DeclAS decl -> 
         decl_codegen decl
     | ExprAS exp ->
         expr_codegen exp
-    | PrintAS(exp, Some typ) -> 
-        begin match typ with
+    | PrintAS exp -> 
+        begin match extract_type exp with
         | IntT ->
-            let (exp_code, _, res_register) = expr_codegen exp scratch_table in
+            let exp_code = expr_codegen exp in
                 exp_code
-                |> Code.add_line ("MOVQ  "^res_register^", %rdi")
+                |> Code.add_line ("MOVQ  "^(resolve @@ extract_location exp)^", %rdi")
                 |> Code.add_line "XOR   %eax, %eax"
                 |> Code.add_line "PUSHQ %r10"
                 |> Code.add_line "PUSHQ %r11"
@@ -88,9 +90,9 @@ let stmt_codegen (stmt : Syntax.stmt) : Code.t =
                 |> Code.add_line "POPQ  %r11";
                 |> Code.add_line "POPQ  %r10"
         | BoolT ->
-            let (exp_code, _, res_register) = expr_codegen exp scratch_table in
+            let exp_code = expr_codegen exp in
                 exp_code
-                |> Code.add_line ("MOVQ  "^res_register^", %rdi")
+                |> Code.add_line ("MOVQ  "^(resolve @@ extract_location exp)^", %rdi")
                 |> Code.add_line "XOR   %eax, %eax"
                 |> Code.add_line "PUSHQ %r10"
                 |> Code.add_line "PUSHQ %r11"
@@ -98,19 +100,19 @@ let stmt_codegen (stmt : Syntax.stmt) : Code.t =
                 |> Code.add_line "POPQ  %r11";
                 |> Code.add_line "POPQ  %r10"
         end
-    | BlockAS bdata ss ->
-        Code.single_line (bdata.name^":")
-        |> Code.add @@ prog_codegen_helper ss Code.empty
+    | BlockAS (bdata, ss) ->
+        Code.single_line ("."^bdata.label_v2^":")
+        |> Code.concat @@ prog_codegen_helper ss Code.empty
 (* FIXME: add escape labels! *)
 
-let rec prog_codegen_helper prog acc : Code.t =
+and prog_codegen_helper prog acc : Code.t =
     match prog with
     | stmt::rest -> let code = stmt_codegen stmt in
                         prog_codegen_helper rest (Code.concat acc code)
     | [] -> acc
 
 let is_decl = function
-    | DeclS(_) -> true
+    | DeclAS(_) -> true
     | _        -> false
 
 let extract_var_name = function
@@ -123,9 +125,9 @@ let make_declarations (var_names : string list) : Code.t =
 let prog_code prog : Code.t =
     let var_names = prog
                     |> List.filter is_decl
-                    |> List.map extract_var_name
-    in let prog_code = prog_codegen_helper prog Code.empty 
-    in let decl_code = make_declarations var_names in
+                    |> List.map extract_var_name in
+    let prog_code = prog_codegen_helper prog Code.empty in
+    let decl_code = make_declarations var_names in
        Code.concat  (decl_code
                     |> Code.prefix ".data\n")
                     (Code.add_line "RET" prog_code

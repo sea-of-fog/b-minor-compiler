@@ -102,7 +102,7 @@ if [ $? -ne 0 ]; then
     exit $?
 fi
 
-ocamlc syntax.cmo parseLib.cmo scanner.cmo parsing.cmo type.cmo errorStateMonad.cmo scopeTable.cmo scope.cmo stateMonad.cmo addressTable.cmo addressing.cmo diffList.cmo code.cmo x86Codegen.cmo compiler.ml -o bmc
+ocamlc syntax.cmo parseLib.cmo scanner.cmo parsing.cmo errorStateMonad.cmo scopeTable.cmo scope.cmo typeTable.cmo type.cmo stateMonad.cmo addressTable.cmo addressing.cmo diffList.cmo code.cmo x86Codegen.cmo compiler.ml -o bmc
 if [ $? -ne 0 ]; then
     echo "Compiler application did not compile"
     exit $?

@@ -95,7 +95,7 @@ let generate_label =
                             current_scope_size = state.current_scope_size;
                             label_num = num + 1
                           } in 
-                return @@ ".B"^(string_of_int num)
+                return @@ "B"^(string_of_int num)
 
 let current_scope_size =
     let* state = get in

@@ -81,6 +81,12 @@ type block_data =
     { label : string;
       local_vars : int }
 
+type block_data_v2 = {
+    label_v2      : string;
+    local_vars_v2 : int;
+    temp_vars_v2  : int;
+    }
+
 type register =
     | RBX
     | R09

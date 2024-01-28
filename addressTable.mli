@@ -18,4 +18,4 @@ val open_scope  : Syntax.block_data -> unit t
 
 (** Close the current scope and return correct block data 
     (with included number of temps) *)
-val close_scope : Syntax.block_data t
+val close_scope : Syntax.block_data_v2 t

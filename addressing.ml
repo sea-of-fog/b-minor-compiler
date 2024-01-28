@@ -45,10 +45,11 @@ let alloc_decl decl =
             let* loc = alloc loc in
                 return @@ SimpADec((loc, typ1), typ2, all_exp)
 
-let alloc_stmt stmt =
+let rec alloc_stmt stmt =
     match stmt with
     | ExprAS e -> 
-        alloc_expr e
+        let* all_e = alloc_expr e in
+            return @@ ExprAS all_e
     | DeclAS d -> 
         let* all_decl = alloc_decl d in
             return @@ DeclAS all_decl
@@ -57,18 +58,22 @@ let alloc_stmt stmt =
             return @@ PrintAS all_e         
     | BlockAS(b, ss) -> 
         let* () = open_scope b in
-            let* alloc_ss = generate_prog ss in
+            let* alloc_ss = alloc_prog ss in
                 let* new_block_data = close_scope in
-                    return @@ BlockSS(new_block_data, alloc_ss)
+                    return @@ BlockAS(new_block_data, alloc_ss)
 
-let rec generate_prog prog = 
+and alloc_prog prog = 
     match prog with
     | [] ->
         return []
     | stmt::prog ->
-        let* stmt = generate_stmt stmt in
-            let* prog = generate_prog prog in
+        let* stmt = alloc_stmt stmt in
+            let* prog = alloc_prog prog in
                 return @@ stmt::prog
 
-let generate_adresses prog =
-    run @@ generate_prog prog
+let make_global_a_block prog =
+    [BlockAS ({ label = "GLOBAL";
+                local_vars = 0;}, prog)]
+
+let generate_addresses prog =
+    run @@ alloc_prog @@ make_global_a_block prog

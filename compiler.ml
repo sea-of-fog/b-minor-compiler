@@ -37,7 +37,10 @@ let typed_prog =
     | TypeTable.Fail msg ->
         failwith "msg"
 
-let target_code = X86Codegen.program_codegen typed_prog
+let addressed_prog = 
+    Addressing.generate_addresses typed_prog
+
+let target_code = X86Codegen.program_codegen addressed_prog
 
 let () = let channel = Out_channel.open_text output_file in 
     output_lines channel target_code; Out_channel.close channel
