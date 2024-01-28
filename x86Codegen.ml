@@ -84,16 +84,21 @@ let rec stmt_codegen stmt : Code.t =
         | IntT ->
             let exp_code = expr_codegen exp in
                 exp_code
+                |> Code.add_line ""
+                |> Code.add_line "# printing integer"
                 |> Code.add_line ("MOVQ  "^(resolve @@ extract_location exp)^", %rdi")
                 |> Code.add_line "XOR   %eax, %eax"
                 |> Code.add_line "PUSHQ %r10"
                 |> Code.add_line "PUSHQ %r11"
                 |> Code.add_line "CALL  print_int"
-                |> Code.add_line "POPQ  %r11";
+                |> Code.add_line "POPQ  %r11"
                 |> Code.add_line "POPQ  %r10"
+                |> Code.add_line ""
         | BoolT ->
             let exp_code = expr_codegen exp in
                 exp_code
+                |> Code.add_line ""
+                |> Code.add_line "# printing boolean"
                 |> Code.add_line ("MOVQ  "^(resolve @@ extract_location exp)^", %rdi")
                 |> Code.add_line "XOR   %eax, %eax"
                 |> Code.add_line "PUSHQ %r10"
@@ -101,6 +106,7 @@ let rec stmt_codegen stmt : Code.t =
                 |> Code.add_line "CALL  print_bool"
                 |> Code.add_line "POPQ  %r11";
                 |> Code.add_line "POPQ  %r10"
+                |> Code.add_line ""
         end
     | BlockAS (bdata, ss) ->
         Code.single_line ("."^bdata.label_v2^":")
