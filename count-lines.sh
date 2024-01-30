@@ -1,2 +1,2 @@
 #!/bin/bash
-git ls-files | grep '\.ml' | xargs wc -l
+git ls-files | grep '\.ml\|.bm' | xargs wc -l
