@@ -48,12 +48,7 @@ let get_top : block_state t =
 let set_top new_top =
     let* state = get in
     let top::rest = state in
-    (* let () = print_string "setting new top, current depth: "; print_int (List.length rest); print_string "\n" in *)
-    let* () = set @@ new_top::rest in
-    let* state = get in 
-    let top::rest = state in
-    (* let () = print_string "new top set, current depth: "; print_int (List.length rest); print_string "\n" in *)
-    return ()
+    set @@ new_top::rest
 
 let free = function
     | GlobalMem _ -> 
