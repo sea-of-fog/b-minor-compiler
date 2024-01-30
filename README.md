@@ -42,7 +42,7 @@ Each code block allocates its own local variables on the stack. Therefore, the s
 ## Bugs and issues
 
 1. [X] Fix the weird issue of each scope opening twice
-2. [ ] Add scope stack back to AddressTable
+2. [X] Add scope stack back to AddressTable
 
 ## Done
 1. [X] Boolean operators in codegen
