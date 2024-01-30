@@ -1,0 +1,18 @@
+{
+    let x:int = 86;
+    let y:bool = true;
+    print y;
+    {
+        let y:bool = false;
+        let x:int = 13;
+        print x;
+        {
+            let x:int = 27;
+            let y:bool = false;
+            print y;
+            print x;
+        }
+        print y;
+    }
+    print x;
+}

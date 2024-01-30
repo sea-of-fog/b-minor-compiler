@@ -2,12 +2,19 @@ open Syntax
 
 type env = (string * int) list
 
-type my_state = { 
+type block_state = { 
     global_env          : string list;
-    local_env_stack     : env list;
+    local_env           : env;
     current_scope_size  : int;
     label_num           : int;
 }
+
+type my_state =
+    block_state list
+
+(* TODO: make the label number a separate part of state *)
+(* TODO: write accessor functions for state components *)
+(* TODO: return to old state, but pass label_num carefully *)
 
 module State = struct
     type t = my_state
@@ -24,10 +31,10 @@ type 'a res =
     | Fail of string
 
 let starting_state = 
-   {global_env = [];
-    local_env_stack = [];
+    [{global_env = [];
+    local_env = [];
     current_scope_size = 0;
-    label_num = 0 }
+    label_num = 0 }]
 
 let return = M.return
 let ( let* ) = M.( let* )
@@ -42,64 +49,59 @@ let fail = M.fail
 
 let add_to_current_scope id =
     let* state = get in
-        match state.local_env_stack with
-        | [] ->
-            begin match List.mem id state.global_env with
+        match state with
+        | glob::[] ->
+            begin match List.mem id glob.global_env with
             | false -> 
-                let* () = set { global_env = id::state.global_env;
-                                local_env_stack = state.local_env_stack;
-                                current_scope_size = 1 + state.current_scope_size;
-                                label_num = state.label_num
-                              } in
+                let* () = set ({ global_env = id::glob.global_env;
+                                local_env = glob.local_env;
+                                current_scope_size = 1 + glob.current_scope_size;
+                                label_num = glob.label_num
+                                }::[]) in
                     return @@ GlobalLoc id
             | true ->
                 fail @@ "variable "^id^" is already bound in current (global) scope"
             end
-        | env::rest ->
-            begin match List.assoc_opt id env with
+        | loc::rest ->
+            begin match List.assoc_opt id loc.local_env with
             | None -> 
-                let pos = state.current_scope_size in
-                    let* () = set { global_env = state.global_env;
-                                    local_env_stack = ((id, pos)::env)::rest;
+                let pos = loc.current_scope_size in
+                    let* () = set ({ global_env = loc.global_env;
+                                    local_env = ((id, pos)::loc.local_env);
                                     current_scope_size = pos + 1;
-                                    label_num = state.label_num
-                                  } in
+                                    label_num = loc.label_num
+                                  }::rest) in
                         return @@ LocalLoc { scope = 0; pos = pos}
             | Some _ ->
                 fail @@ "variable "^id^" is already bound in current (local) scope"
             end
 
 let open_scope =
-    let* state = get in
-        set { local_env_stack = []::(state.local_env_stack);
-              global_env = state.global_env;
+    let* top::rest = get in
+    set ({    local_env = [];
+              global_env = [];
               current_scope_size = 0;
-              label_num = state.label_num}     
+              label_num = top.label_num}::top::rest)
 
 let close_scope = 
     let* state = get in
-        match state.local_env_stack with
-        | _::rest ->
-            set { local_env_stack = rest;
-                  global_env = state.global_env;
-                  current_scope_size = 0;
-                  label_num = state.label_num}     
+        match state with
         | [] ->
-            failwith "ScopeTable: Tried closing global scope"
+            failwith "ScopeTable: global scope already closed, something fucked up"
+        | glob::[] ->
+            failwith "ScopeTable: tried closing global scope"
+        | top::new_top::rest ->
+            set ({new_top with label_num = top.label_num}::rest)
 
 let generate_label =
-    let* state = get in
-        let num = state.label_num in
-            let* () = set { local_env_stack = state.local_env_stack;
-                            global_env = state.global_env;
-                            current_scope_size = state.current_scope_size;
-                            label_num = num + 1
-                          } in 
+    let* top::rest = get in
+        let num = top.label_num in
+            let* () = set ({top with label_num = 1 + top.label_num}::rest) in
                 return @@ "B"^(string_of_int num)
 
 let current_scope_size =
-    let* state = get in
-        return state.current_scope_size
+    let* top::rest = get in
+        return top.current_scope_size
 
 let rec assoc_ind id env =
     match env with
@@ -114,12 +116,14 @@ let rec assoc_ind id env =
         | Some ind ->
             Some (ind + 1)
 
-let rec local_lookup id (stack : env list) : location option = 
-    match stack with
+let rec local_lookup id state : location option = 
+    match state with
     | [] ->
         None
-    | env::rest ->
-        begin match List.assoc_opt id env with
+    | glob::[] ->
+        None
+    | loc::rest ->
+        begin match List.assoc_opt id loc.local_env with
         | Some ind ->
           Some (LocalLoc { pos = ind;
             scope = 0
@@ -133,15 +137,22 @@ let rec local_lookup id (stack : env list) : location option =
             end
         end
 
+let rec global_lookup id state =
+    match state with
+    | [] ->
+        None
+    | glob::[] ->
+        if List.mem id glob.global_env
+        then Some (GlobalLoc id)
+        else None
+
 let lookup id = 
     let* state = get in
-        match local_lookup id state.local_env_stack with
+        match local_lookup id state with
         | None ->
-            begin match List.mem id state.global_env with
-            | false ->
-                fail @@ "unbound variable "^id 
-            | true ->
-                return @@ GlobalLoc id
+            begin match global_lookup id state with
+            | Some location -> return location
+            | None          -> fail @@ "unbound variable "^id
             end
         | Some location ->
             return location

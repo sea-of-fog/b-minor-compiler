@@ -42,11 +42,18 @@ let run comp =
 
 let get_top : block_state t =
     let* top::rest = get in
+    (* let () = print_string "getting top, current depth: "; print_int (List.length rest); print_string "\n" in *)
         return top
 
 let set_top new_top =
-    let* top::rest = get in
-        set @@ new_top::rest
+    let* state = get in
+    let top::rest = state in
+    (* let () = print_string "setting new top, current depth: "; print_int (List.length rest); print_string "\n" in *)
+    let* () = set @@ new_top::rest in
+    let* state = get in 
+    let top::rest = state in
+    (* let () = print_string "new top set, current depth: "; print_int (List.length rest); print_string "\n" in *)
+    return ()
 
 let free = function
     | GlobalMem _ -> 
@@ -68,8 +75,9 @@ let alloc = function
     | GlobalLoc s ->
         return @@ GlobalMem s
     | LocalLoc { scope; pos } ->
-        let* state = get_top in
-        return @@ LocalMem (1 + pos + state.local_pref - state.locals)
+        let* top_state = get_top in
+        (* FIXME: gotta add the stack back ): *)
+        return @@ LocalMem (1 + pos + top_state.local_pref - top_state.locals)
     | TempLoc ->
         let* state = get_top in
         begin match state.free_registers with
@@ -93,6 +101,7 @@ let block_data_v2_of_state state =
 
 let open_scope block_data = 
     let* state = get in
+    (* let () = print_string @@ "opening "^block_data.label^", depth: "; print_int (List.length state); print_string "\n" in *)
     (* opening global scope *)
     match state with
     | [] ->
@@ -113,7 +122,19 @@ let open_scope block_data =
                         name = block_data.label} in
         set @@ new_top::top::state
 
-let close_scope =
+let pop_top =
     let* top::rest = get in
-    let* () = set rest in
-    return @@ block_data_v2_of_state top
+        set rest
+
+let close_scope =
+    let* state = get in
+    match state with
+    | top1::top2::rest ->
+        let new_block_data = block_data_v2_of_state top1 in
+        let* () = pop_top in
+        let* () = pop_top in
+        return @@ new_block_data
+    | top::[] ->
+        let new_block_data = block_data_v2_of_state top in
+        let* () = pop_top in
+        return @@ new_block_data

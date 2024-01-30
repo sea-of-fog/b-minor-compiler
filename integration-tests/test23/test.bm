@@ -1,0 +1,22 @@
+{
+    let x:int = 86;
+    {
+        let x:int = 13;
+        print x;
+    }
+    {
+        let x:int = 27;
+        print x;
+        {
+            let y:bool = true;
+            print y;
+            print 11;
+        }
+        {
+            let y:bool = false;
+            print 28;
+            print y;
+        }
+    }
+    print x;
+}
