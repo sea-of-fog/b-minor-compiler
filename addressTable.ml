@@ -66,13 +66,18 @@ let free = function
         let temps = (TempMem ind)::temps in
         set_top { state with free_temps = temps }
 
+let rec local_alloc scope pos stack =
+    if scope == 0 then
+        let top_state = List.hd stack in
+            LocalMem (1 + pos + top_state.local_pref - top_state.locals)
+    else local_alloc (scope - 1) pos (List.tl stack)
+
 let alloc = function
     | GlobalLoc s ->
         return @@ GlobalMem s
     | LocalLoc { scope; pos } ->
-        let* top_state = get_top in
-        (* FIXME: gotta add the stack back ): *)
-        return @@ LocalMem (1 + pos + top_state.local_pref - top_state.locals)
+        let* stack = get in
+        return @@ local_alloc scope pos stack
     | TempLoc ->
         let* state = get_top in
         begin match state.free_registers with
