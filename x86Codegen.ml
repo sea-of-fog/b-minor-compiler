@@ -187,15 +187,42 @@ let extract_var_name = function
 (* integers are initialized as 0 *)
 let make_declarations (var_names : string list) : Code.t =
     Code.from_list (List.map (fun id -> id^": .quad 0") var_names)
+
+let increase_mem n mem =
+    match mem with
+    | LocalMem ind -> LocalMem (ind + n)
+    | mem          -> mem
+
+let rec increase_exp exp n =
+    match exp with
+    | NumAE((mem, typ), l)              -> NumAE((increase_mem n mem, typ), l) 
+    | TrueAE (mem, typ)                 -> TrueAE(increase_mem n mem, typ)
+    | FalseAE (mem, typ)                -> FalseAE(increase_mem n mem, typ)
+    | VarAE (mem, typ)                  -> VarAE(increase_mem n mem, typ)
+    | AssAE((mem, typ), exp)            -> AssAE((increase_mem n mem, typ), increase_exp exp n)
+    | OpAE((mem, typ), op, exp1, exp2)  -> OpAE((increase_mem n mem, typ), op, increase_exp exp1 n, increase_exp exp2 n)
+
+let increase_decl decl n =
+    match decl with
+    | SimpADec ((mem, typ1), typ2, exp) -> SimpADec ((increase_mem n mem, typ1), typ2, increase_exp exp n)
+
+let rec increase_locals_stmt n =
+    function
+    | ExprAS exp  -> ExprAS  (increase_exp exp n)
+    | PrintAS exp -> PrintAS (increase_exp exp n)
+    | DeclAS d    -> DeclAS  (increase_decl d n)
+    | BlockAS (bdata, stmts) -> BlockAS (bdata, List.map (increase_locals_stmt n) stmts)
     
 let prog_code prog : Code.t =
     let [global_block] = prog in
     let needed_temps = max_temps global_block in
     let needed_local = max_local global_block in
+    let global_block = increase_locals_stmt needed_temps global_block in
     let var_names = let BlockAS(_, stmts) = global_block in
                     stmts
                     |> List.filter is_decl
                     |> List.map extract_var_name in
+    let prog = [global_block] in
     let prog_code = prog_codegen_helper prog Code.empty in
     let decl_code = make_declarations var_names in
        Code.concat  (decl_code
