@@ -41,7 +41,7 @@ Each code block allocates its own local variables on the stack. Therefore, the s
 
 ## Bugs and issues
 
-1. [ ] Fix the weird issue of each scope opening twice
+1. [X] Fix the weird issue of each scope opening twice
 2. [ ] Add scope stack back to AddressTable
 
 ## Done

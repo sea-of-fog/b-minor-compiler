@@ -120,21 +120,10 @@ let open_scope block_data =
                         free_temps = [];
                         free_registers = R10::R11::R12::R13::R14::R15::[];
                         name = block_data.label} in
-        set @@ new_top::top::state
-
-let pop_top =
-    let* top::rest = get in
-        set rest
+        set @@ new_top::top::rest
 
 let close_scope =
-    let* state = get in
-    match state with
-    | top1::top2::rest ->
-        let new_block_data = block_data_v2_of_state top1 in
-        let* () = pop_top in
-        let* () = pop_top in
-        return @@ new_block_data
-    | top::[] ->
-        let new_block_data = block_data_v2_of_state top in
-        let* () = pop_top in
-        return @@ new_block_data
+    let* top::rest = get in
+    let new_block_data = block_data_v2_of_state top in
+    let* () = set rest in
+    return @@ new_block_data
