@@ -1,10 +1,10 @@
 open Syntax
 
-type env = (location * typ) list
+type 'a env = ('a * typ) list
 
 type my_state = { 
-    global_env          : env;
-    local_env_stack     : env list;
+    global_env          : location env;
+    local_env_stack     : int env list;
 }
 
 module State = struct
@@ -38,19 +38,26 @@ let run comp =
     | M.Fail msg ->
         Fail msg
 
-let fail = M.fail
+let fail = 
+    M.fail
 
 let add_to_current_scope loc typ =
     let* state = get in
         match state.local_env_stack with
         | [] ->
-            set { global_env = (loc,typ)::(state.global_env);
-                  local_env_stack = []
-                }
+            begin match loc with
+            | GlobalLoc id ->
+            set { state with global_env = ((GlobalLoc id),typ)::(state.global_env)}
+            | LocalLoc data ->
+                failwith "TypeTable: local variable in global scope, scope resolver fucked up"
+            end
         | env::rest ->
-            set { global_env = state.global_env;
-                  local_env_stack = ((loc, typ)::env)::rest
-                }
+            begin match loc with
+            | GlobalLoc id ->
+                failwith "TypeTable: global variable in local scope, scope resolver fucked up"
+            | LocalLoc {pos; scope} ->
+                set { state with local_env_stack = ((pos,typ)::env)::rest }
+            end
 
 let open_scope =
     let* state = get in
@@ -63,24 +70,32 @@ let close_scope =
         | [] ->
             failwith "TypeTable: tried closing global scope"
         | env::rest ->
-            set { global_env = state.global_env;
-                  local_env_stack = rest }
+            set { state with local_env_stack = rest }
+
+let print_loc = function
+    | GlobalLoc id -> id
+    | LocalLoc { pos; scope } -> "{ pos = "^(string_of_int pos)^", scope = "^(string_of_int scope)^"}"
 
 let rec state_lookup loc global local =
-    match local with
-    | [] ->
+    match loc with
+    | GlobalLoc id ->
         begin match List.assoc_opt loc global with
-            | Some typ 
-                -> typ
-            | None
-                -> failwith "TypeTable: variable not in any scope, scope resolver fucked up"
+            | Some typ ->
+                typ
+            | None ->
+                failwith @@ "TypeTable: unbound global variable"^(print_loc loc)^", scope resolver fucked up"
         end
-    | env::rest ->
-        match List.assoc_opt loc env with
-        | Some typ ->
-            typ
-        | None ->
-            state_lookup loc global rest
+    | LocalLoc { pos; scope } ->
+        if scope = 0 
+        then match List.assoc_opt pos (List.hd local) with
+            | Some typ ->
+                typ
+            | None ->
+                failwith @@ "TypeTable: unbound local variable"^(print_loc loc)^", scope resolver fucked up"
+        else state_lookup (LocalLoc { pos = pos; scope = scope - 1 })
+                           global 
+                          (List.tl local)
+
 
 let lookup loc =
     let* state = get in
