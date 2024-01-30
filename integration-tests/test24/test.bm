@@ -1,0 +1,20 @@
+{
+    let x:bool = true;
+    print x;
+    {
+        print x;
+        let x:int = 89;
+        print x;
+    }
+    {
+        print x;
+        let x:bool = false;
+        {
+            print x;
+            let x:int = 20;
+            print x;
+        }
+        print x;
+    }
+    print x;
+}
