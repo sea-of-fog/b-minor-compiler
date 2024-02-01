@@ -1,6 +1,6 @@
 let argc = Array.length Sys.argv
 
-let () = if argc <> 2 then
+let () = if argc <> 3 then
             (print_string "Usage: bmc SOURCE TARGET"; exit 1)
         else ()
 
