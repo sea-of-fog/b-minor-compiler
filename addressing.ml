@@ -69,6 +69,10 @@ let rec alloc_stmt stmt =
         let* all_exp = alloc_expr exp in
             let* all_stmt = alloc_stmt stmt in
                 return @@ IfAS(all_exp, all_stmt)
+    | WhileAS(exp, stmt) ->
+        let* all_exp = alloc_expr exp in
+            let* all_stmt = alloc_stmt stmt in
+                return @@ WhileAS(all_exp, all_stmt)
 
 and alloc_prog prog = 
     match prog with
