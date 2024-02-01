@@ -1,0 +1,33 @@
+let x : int = 18;
+let y : int = 12;
+let z : bool = true;
+
+z = x < y;
+print z;
+z = y < x; 
+print z;
+
+z = x > y;
+print z;
+z = y < x; 
+print >;
+
+z = x <= y;
+print z;
+z = y <= x; 
+print z;
+
+z = x >= y;
+print z;
+z = y >= x; 
+print z;
+
+z = x == y;
+print z;
+z = y == x; 
+print z;
+
+z = x != y;
+print z;
+z = y != x; 
+print z;
