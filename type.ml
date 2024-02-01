@@ -85,6 +85,10 @@ let rec infer_stmt stmt =
         let* ann_exp = check_expr BoolT exp in
             let* ann_stmt = infer_stmt stmt in
                 return @@ IfAS(ann_exp, ann_stmt)
+    | WhileAS(exp, stmt) ->
+        let* ann_exp = check_expr BoolT exp in
+            let* ann_stmt = infer_stmt stmt in
+                return @@ WhileAS(ann_exp, ann_stmt)
 
 and infer_block ss =
     match ss with
