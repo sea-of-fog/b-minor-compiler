@@ -27,6 +27,13 @@ let rec max_local = function
     | BlockAS (bdata, stmts) ->
         bdata.local_vars_v2 + (List.fold_left max 0 (List.map max_local stmts))
 
+let comp_box = 
+    ref 0
+
+let generate_comparison_label () =
+        let cnt = !comp_box in
+            comp_box := cnt + 1; (".COMP_TRUE"^(string_of_int cnt), ".COMP_ESC"^(string_of_int cnt))
+
 let resolve_reg = function
     | RBX -> "%rbx"
     | R09 -> "%r9"
@@ -76,6 +83,23 @@ let generic_operator instr exp1 exp2 tgt =
                         (move (RegisterMem R09) tgt)
         end
 
+let op_to_string = function
+    | Add -> "ADDQ"
+    | Sub -> "SUBQ"
+    | Or  -> "ORQ "
+    | And -> "ANDQ"
+    | Mul -> "IMULQ"
+    | Div -> "IDIVQ"
+    | _   -> failwith "shouldn't have tried to turn this operator to string"
+    
+let jump_of_op = function
+    | Lt  -> "JL   "
+    | Gt  -> "JG   "
+    | Leq -> "JLE  "
+    | Geq -> "JLE  "
+    | Eq  -> "JE   "
+    | Neq -> "JNE  "
+
 let rec expr_codegen = function
     | NumAE((mem, _), n) ->
         move_const mem n
@@ -85,22 +109,10 @@ let rec expr_codegen = function
         move_const mem (-1)
     | FalseAE(mem, _) ->
         move_const mem 0
-    | OpAE((mem, _), Add, exp1, exp2) -> 
+    | OpAE((mem, _), ((Add|Sub|And|Or) as op), exp1, exp2) -> 
         Code.concat (Code.concat (expr_codegen exp1)
                                  (expr_codegen exp2))
-                    (generic_operator "ADDQ" exp2 exp1 mem)
-    | OpAE((mem, _), Sub, exp1, exp2) -> 
-        Code.concat (Code.concat (expr_codegen exp1)
-                                 (expr_codegen exp2))
-                    (generic_operator "SUBQ" exp2 exp1 mem)
-    | OpAE((mem, _), And, exp1, exp2) -> 
-        Code.concat (Code.concat (expr_codegen exp1)
-                                 (expr_codegen exp2))
-                    (generic_operator "ANDQ" exp2 exp1 mem)
-    | OpAE((mem, _), Or, exp1, exp2) -> 
-        Code.concat (Code.concat (expr_codegen exp1)
-                                 (expr_codegen exp2))
-                    (generic_operator "ORQ" exp2 exp1 mem)
+                    (generic_operator (op_to_string op) exp2 exp1 mem)
     | OpAE((mem, _), Mul, exp1, exp2) ->
         Code.concat (Code.concat (expr_codegen exp1)
                                  (expr_codegen exp2))
@@ -118,6 +130,22 @@ let rec expr_codegen = function
                      |> Code.add_line ("IDIVQ "^(resolve @@ extract_location exp2))
                      |> Code.add_line ("MOVQ %rax, "^(resolve mem))
                      |> Code.add_line "POPQ %rdx")
+    | OpAE((mem, _), ((Lt|Gt|Leq|Geq|Eq|Neq) as comp_op), exp1, exp2) ->
+        let (true_label, escape_label) = generate_comparison_label () in
+            let instr = jump_of_op comp_op in
+                Code.concat (Code.concat (expr_codegen exp1) 
+                                         (expr_codegen exp2))
+                            (((Code.concat (move (extract_location exp1) (RegisterMem RBX))
+                                           (move (extract_location exp2) (RegisterMem R09)))
+                            |> Code.add_line "CMPQ %rbx, %r9"
+                            |> Code.add_line (instr^"  "^true_label)
+                            |> Code.rev_concat (move_const mem 0)
+                            |> Code.add_line ("JMP  "^escape_label)
+                            |> Code.add_line (true_label^":")
+                            |> Code.rev_concat (move_const mem (-1))
+                            |> Code.add_line (escape_label^":"))
+                            |> Code.prefix "# comparison starting"
+                            |> Code.add_line "# comparison ending")
     | AssAE((mem, _), exp) ->
         Code.concat (expr_codegen exp)
                     (move (extract_location exp) mem)

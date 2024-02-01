@@ -43,6 +43,9 @@ Each code block allocates its own local variables on the stack. Therefore, the s
 
 1. [X] Fix the weird issue of each scope opening twice
 2. [X] Add scope stack back to AddressTable
+3. [ ] Move max_temps etc. and the whole temp processing to the addressing module
+4. [ ] Check all the partial matches
+5. [ ] Make the state of label generators internal
 
 ## Done
 1. [X] Boolean operators in codegen

@@ -18,6 +18,9 @@ let add_line line code =
 let concat c1 c2 = 
     Concat (c1, c2)
 
+let rev_concat c1 c2 = 
+    Concat (c2, c1)
+
 let prefix line code =
     Prefix (line, code)
 
