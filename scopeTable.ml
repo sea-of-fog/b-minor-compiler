@@ -145,6 +145,8 @@ let rec global_lookup id state =
         if List.mem id glob.global_env
         then Some (GlobalLoc id)
         else None
+    | loc::rest ->
+        global_lookup id rest
 
 let lookup id = 
     let* state = get in
