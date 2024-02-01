@@ -1,0 +1,16 @@
+let n:int = 2137;
+let i:int = 2;
+
+while(i <= n){
+
+    let guard:bool = true;
+    let j:int = 2;
+
+    while(j*j <= i){
+        if( (i/j)*j == i ) guard = false;
+        j = j + 1;
+    }
+
+    if(guard) print i;
+    i = i + 1;
+}
