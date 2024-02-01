@@ -1,5 +1,7 @@
-while(18){
-    print 27;
-    let x:int = 89;
-    print x;
-    }
+let n:int = 10;
+let fact:int = 1;
+while(n > 0){
+    fact = fact * n;
+    n = n - 1;
+}
+print fact;

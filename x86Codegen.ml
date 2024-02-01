@@ -18,6 +18,8 @@ let rec max_temps = function
             (List.fold_left max 0 (List.map max_temps stmts))
     | IfAS (exp, stmt) ->
             max_temps stmt
+    | WhileAS (exp, stmt) ->
+            max_temps stmt
 
 let rec max_local = function
     | ExprAS _ ->
@@ -29,6 +31,8 @@ let rec max_local = function
     | BlockAS (bdata, stmts) ->
         bdata.local_vars_v2 + (List.fold_left max 0 (List.map max_local stmts))
     | IfAS (exp, stmt) ->
+            max_local stmt
+    | WhileAS (exp, stmt) ->
             max_local stmt
 
 let comp_box = 
@@ -42,8 +46,15 @@ let if_box =
     ref 0
 
 let generate_if_label () =
-        let cnt = !comp_box in
-            comp_box := cnt + 1; ".IF_ESC"^(string_of_int cnt)
+        let cnt = !if_box in
+            if_box := cnt + 1; ".IF_ESC"^(string_of_int cnt)
+
+let while_box = 
+    ref 0
+
+let generate_while_label () =
+        let cnt = !while_box in
+            while_box := cnt + 1; (".WHILE_ESC"^(string_of_int cnt), ".WHILE_LOOP"^(string_of_int cnt))
 
 let resolve_reg = function
     | RBX -> "%rbx"
@@ -221,6 +232,22 @@ let rec stmt_codegen stmt : Code.t =
                          |> Code.add_line ("JE  "^escape_label))
                         stmt_code)
             |> Code.add_line (escape_label^":")
+    | WhileAS (exp, stmt) ->
+        let (escape_label, loop_label) = generate_while_label () in
+        let exp_code = expr_codegen exp in
+        let exp_mem = extract_location exp in
+        let stmt_code = stmt_codegen stmt in
+            Code.single_line "# while loop"
+            |> Code.add_line (loop_label^":")
+            |> Code.add_line "# evaluating condition"
+            |> Code.rev_concat exp_code
+            |> Code.rev_concat (move exp_mem (RegisterMem RBX))
+            |> Code.add_line "MOVQ $(0), %r9"
+            |> Code.add_line "CMPQ %rbx, %r9"
+            |> Code.add_line ("JE  "^escape_label)
+            |> Code.rev_concat stmt_code
+            |> Code.add_line ("JMP  "^loop_label)
+            |> Code.add_line (escape_label^":")
 (*TODO: Add type tests for ifs! *)
 
 and prog_codegen_helper prog acc : Code.t =
@@ -265,6 +292,7 @@ let rec increase_locals_stmt n =
     | DeclAS d    -> DeclAS  (increase_decl d n)
     | BlockAS (bdata, stmts) -> BlockAS (bdata, List.map (increase_locals_stmt n) stmts)
     | IfAS (exp, stmt) -> IfAS (increase_exp exp n, increase_locals_stmt n stmt)
+    | WhileAS (exp, stmt) -> WhileAS (increase_exp exp n, increase_locals_stmt n stmt)
     
 let prog_code prog : Code.t =
     let [global_block] = prog in

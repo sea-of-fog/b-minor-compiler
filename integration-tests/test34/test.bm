@@ -1,0 +1,5 @@
+while(18){
+    print 27;
+    let x:int = 89;
+    print x;
+    }
