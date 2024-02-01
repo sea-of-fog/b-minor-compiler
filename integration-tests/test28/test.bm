@@ -10,7 +10,7 @@ print z;
 z = x > y;
 print z;
 z = y < x; 
-print >;
+print z;
 
 z = x <= y;
 print z;
