@@ -1,0 +1,6 @@
+let alumn:int = 881;
+if(alumn < 13) print 2137;
+if(alumn >= 21){
+    let alumn:int = 800;
+    print alumn-100;
+    }
