@@ -66,7 +66,8 @@ let rec stmt ts =
    ((liftA3 (kword Print) expr semicolon (fun _ e _ -> PrintS e))
 <|> (liftA2 decl semicolon (fun d _ -> DeclS d))
 <|> (liftA2 expr semicolon (fun e _ -> ExprS e))
-<|> (liftA3 (symbol OpenCurly) (many stmt) (symbol ClosedCurly) (fun _ ss _ -> BlockS ss))) ts
+<|> (liftA3 (symbol OpenCurly) (many stmt) (symbol ClosedCurly) (fun _ ss _ -> BlockS ss))
+<|> (liftA5 (kword If) (symbol OpenParen) expr (symbol ClosedParen) stmt (fun _ _ e _ stmt -> IfS (e, stmt)))) ts
 
 and decl ts =
     (liftA6 _let id colon typ equal expr (fun _ (Id x) _ typ _ expr -> SimpDec(x, typ, expr))) ts

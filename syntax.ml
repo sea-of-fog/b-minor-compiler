@@ -53,7 +53,7 @@ type stmt =
     | PrintS of expr
     | DeclS  of decl
     | ExprS  of expr 
-    | IfS    of stmt
+    | IfS    of expr * stmt
     | BlockS of stmt list
 
 type prog = stmt list
@@ -74,7 +74,7 @@ type ('a, 'b) ann_stmt =
     | DeclAS  of 'b ann_decl
     | ExprAS  of 'b ann_expr 
     | BlockAS of 'a * (('a, 'b) ann_stmt) list
-    | IfAS    of ('a, 'b) ann_stmt
+    | IfAS    of 'b ann_expr * ('a, 'b) ann_stmt
 
 type ('a, 'b) ann_prog =
     ('a, 'b) ann_stmt list
