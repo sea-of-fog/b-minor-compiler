@@ -46,6 +46,7 @@ Each code block allocates its own local variables on the stack. Therefore, the s
 3. [ ] Move max_temps etc. and the whole temp processing to the addressing module
 4. [ ] Check all the partial matches
 5. [ ] Make the state of label generators internal
+6. [ ] Find out why parsing and lexing became so slow with the addition of comparison operators
 
 ## Done
 1. [X] Boolean operators in codegen

@@ -74,24 +74,23 @@ let number_lex str =
 let operator_lex str =
     if (String.length str = 0)
     then None
-    else match (String.sub str 0 1) with
-         | "+" -> Some ((Op (Add)), suffix str)
-         | "-" -> Some ((Op (Sub)), suffix str)
-         | "*" -> Some ((Op (Mul)), suffix str)
-         | "/" -> Some ((Op (Div)), suffix str)
-         | ">" -> Some ((Op (Gt)), suffix str)
-         | "<" -> Some ((Op (Lt)), suffix str)
-         | _   -> if (String.length str < 2)
-                  then None
-                  else begin match (String.sub str 0 2) with
-                       | "&&" -> Some ((Op And), suffix_from 2 str)
-                       | "||" -> Some ((Op Or), suffix_from 2 str)
-                       | "!=" -> Some ((Op Neq), suffix_from 2 str)
-                       | "==" -> Some ((Op Eq), suffix_from 2 str)
-                       | "<=" -> Some ((Op Leq), suffix_from 2 str)
-                       | ">=" -> Some ((Op Geq), suffix_from 2 str)
-                       | _    -> None
-                       end
+    else match (String.sub str 0 2) with
+         | "&&" -> Some ((Op And), suffix_from 2 str)
+         | "||" -> Some ((Op Or), suffix_from 2 str)
+         | "!=" -> Some ((Op Neq), suffix_from 2 str)
+         | "==" -> Some ((Op Eq), suffix_from 2 str)
+         | "<=" -> Some ((Op Leq), suffix_from 2 str)
+         | ">=" -> Some ((Op Geq), suffix_from 2 str)
+         | _    -> 
+            begin match (String.sub str 0 1) with
+                  | "+" -> Some ((Op (Add)), suffix str)
+                  | "-" -> Some ((Op (Sub)), suffix str)
+                  | "*" -> Some ((Op (Mul)), suffix str)
+                  | "/" -> Some ((Op (Div)), suffix str)
+                  | ">" -> Some ((Op (Gt)), suffix str)
+                  | "<" -> Some ((Op (Lt)), suffix str)
+                  | _   -> None
+            end
 
 let paren_lex str =
     if (String.length str = 0)

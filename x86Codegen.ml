@@ -96,7 +96,7 @@ let jump_of_op = function
     | Lt  -> "JL   "
     | Gt  -> "JG   "
     | Leq -> "JLE  "
-    | Geq -> "JLE  "
+    | Geq -> "JGE  "
     | Eq  -> "JE   "
     | Neq -> "JNE  "
 
@@ -137,7 +137,7 @@ let rec expr_codegen = function
                                          (expr_codegen exp2))
                             (((Code.concat (move (extract_location exp1) (RegisterMem RBX))
                                            (move (extract_location exp2) (RegisterMem R09)))
-                            |> Code.add_line "CMPQ %rbx, %r9"
+                            |> Code.add_line "CMPQ %r9, %rbx"
                             |> Code.add_line (instr^"  "^true_label)
                             |> Code.rev_concat (move_const mem 0)
                             |> Code.add_line ("JMP  "^escape_label)

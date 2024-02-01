@@ -9,8 +9,8 @@ print z;
 
 z = x > y;
 print z;
-z = y < x; 
-print >;
+z = y > x; 
+print z;
 
 z = x <= y;
 print z;
