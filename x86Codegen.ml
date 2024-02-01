@@ -216,8 +216,9 @@ let rec stmt_codegen stmt : Code.t =
         let stmt_code = stmt_codegen stmt in
             (Code.concat (exp_code
                          |> Code.rev_concat (move exp_mem (RegisterMem RBX))
-                         |> Code.add_line "CMPQ %rbx, $(0)"
-                         |> Code.add_line ("JMP  "^escape_label))
+                         |> Code.add_line "MOVQ $(0), %r9"
+                         |> Code.add_line "CMPQ %rbx, %r9"
+                         |> Code.add_line ("JE  "^escape_label))
                         stmt_code)
             |> Code.add_line (escape_label^":")
 (*TODO: Add type tests for ifs! *)
