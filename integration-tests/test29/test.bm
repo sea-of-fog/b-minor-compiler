@@ -1,0 +1,3 @@
+let x:bool = true;
+let y:int = 17;
+print x<y
