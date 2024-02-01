@@ -1,3 +1,9 @@
+let argc = Array.length Sys.argv
+
+let () = if argc < 2 then
+            (print_string "Usage: bmc SOURCE TARGET"; exit 1)
+        else ()
+
 let source_file = 
     Sys.argv.(1)
 let output_file = 
