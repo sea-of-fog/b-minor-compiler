@@ -48,6 +48,10 @@ let rec resolve_stmt stmt =
                     let* block_cnt = current_scope_size in
                         let* () = close_scope in
                             return @@ BlockAS ({ label = label; local_vars = block_cnt }, ann_ss)
+    | IfS (exp, stmt) ->
+        let* ann_exp = resolve_expr exp in
+            let* ann_stmt = resolve_stmt stmt in
+                return @@ IfAS (ann_exp, ann_stmt)
 
 and resolve_prog prog =
     match prog with
