@@ -65,6 +65,10 @@ let rec alloc_stmt stmt =
             let* alloc_ss = alloc_prog ss in
                 let* new_block_data = close_scope in
                     return @@ BlockAS(new_block_data, alloc_ss)
+    | IfAS(exp, stmt) ->
+        let* all_exp = alloc_expr exp in
+            let* all_stmt = alloc_stmt stmt in
+                return @@ IfAS(all_exp, all_stmt)
 
 and alloc_prog prog = 
     match prog with
