@@ -44,6 +44,11 @@ and infer_expr exp =
             let* ann_e1 = check_expr BoolT e1 in
                 let* ann_e2 = check_expr BoolT e2 in
                     return @@ OpAE((loc, BoolT), op, ann_e1, ann_e2)
+        | Lt | Gt | Leq | Geq | Eq | Neq ->
+            let* ann_e1 = infer_expr e1 in
+                let typ = extract_type ann_e1 in
+                    let* ann_e2 = check_expr typ e2 in
+                        return @@ OpAE((loc, BoolT), op, ann_e1, ann_e2)
         end
     | AssAE(loc, exp) -> 
         let* expected_type = lookup loc in
