@@ -49,6 +49,7 @@ let id_lex str =
         | "false"  -> Some (Keyword False, s)
         | "int"    -> Some (Keyword Int, s)
         | "bool"   -> Some (Keyword Bool, s)
+        | "if"     -> Some (Keyword If, s)
         | id       -> Some (Id id, s)
         end
 
