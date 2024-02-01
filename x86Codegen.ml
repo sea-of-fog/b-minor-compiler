@@ -34,6 +34,13 @@ let generate_comparison_label () =
         let cnt = !comp_box in
             comp_box := cnt + 1; (".COMP_TRUE"^(string_of_int cnt), ".COMP_ESC"^(string_of_int cnt))
 
+let if_box = 
+    ref 0
+
+let generate_if_label () =
+        let cnt = !comp_box in
+            comp_box := cnt + 1; ".IF_ESC"^(string_of_int cnt)
+
 let resolve_reg = function
     | RBX -> "%rbx"
     | R09 -> "%r9"
@@ -198,6 +205,18 @@ let rec stmt_codegen stmt : Code.t =
         prog_codegen_helper ss Code.empty
         |> Code.prefix ("."^bdata.label_v2^":")
 (* FIXME: add escape labels! *)
+    | IfAS (exp, stmt) ->
+        let escape_label = generate_if_label () in
+        let exp_code = expr_codegen exp in
+        let exp_mem = extract_location exp in
+        let stmt_code = stmt_codegen stmt in
+            (Code.concat (exp_code
+                         |> Code.rev_concat (move exp_mem (RegisterMem RBX))
+                         |> Code.add_line "CMPQ %rbx, $(0)"
+                         |> Code.add_line ("JMP  "^escape_label))
+                        stmt_code)
+            |> Code.add_line (escape_label^":")
+(*TODO: Add type tests for ifs! *)
 
 and prog_codegen_helper prog acc : Code.t =
     match prog with
