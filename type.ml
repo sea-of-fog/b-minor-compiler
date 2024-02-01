@@ -81,6 +81,10 @@ let rec infer_stmt stmt =
             let* ann_ss = infer_block ss in
                 let* () = close_scope in
                     return @@ BlockAS(block_data, ann_ss)
+    | IfAS(exp, stmt) ->
+        let* ann_exp = check_expr BoolT exp in
+            let* ann_stmt = infer_stmt stmt in
+                return @@ IfAS(ann_exp, ann_stmt)
 
 and infer_block ss =
     match ss with
