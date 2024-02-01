@@ -263,6 +263,7 @@ let rec increase_locals_stmt n =
     | PrintAS exp -> PrintAS (increase_exp exp n)
     | DeclAS d    -> DeclAS  (increase_decl d n)
     | BlockAS (bdata, stmts) -> BlockAS (bdata, List.map (increase_locals_stmt n) stmts)
+    | IfAS (exp, stmt) -> IfAS (increase_exp exp n, increase_locals_stmt n stmt)
     
 let prog_code prog : Code.t =
     let [global_block] = prog in
