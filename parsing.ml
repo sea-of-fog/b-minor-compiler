@@ -34,6 +34,24 @@ let mul =
 let div =
     const (Op Div) Div
 
+let lt =
+    const (Op Lt) Lt
+
+let gt =
+    const (Op Gt) Gt
+
+let leq =
+    const (Op Leq) Leq
+
+let geq =
+    const (Op Geq) Geq
+
+let eq =
+    const (Op Eq) Eq
+
+let neq =
+    const (Op Neq) Neq
+
 let open_paren =
     const OpenParen ()
 
@@ -65,8 +83,18 @@ and or_expr ts =
 <|> and_expr) ts
 
 and and_expr ts =
-    ((liftA3 ar_expr (symbol @@ Op And) and_expr (fun e1 _ e2 -> OpE(And, e1, e2)))
-<|> ar_expr) ts
+    ((liftA3 comp_expr (symbol @@ Op And) and_expr (fun e1 _ e2 -> OpE(And, e1, e2)))
+<|> comp_expr) ts
+
+and comp_expr ts =
+   ((liftA3 ar_expr (symbol @@ Op Lt)  comp_expr (fun e1 _ e2 -> OpE(Lt,  e1, e2)))
+<|> (liftA3 ar_expr (symbol @@ Op Gt)  comp_expr (fun e1 _ e2 -> OpE(Gt,  e1, e2)))
+<|> (liftA3 ar_expr (symbol @@ Op Leq) comp_expr (fun e1 _ e2 -> OpE(Leq, e1, e2)))
+<|> (liftA3 ar_expr (symbol @@ Op Geq) comp_expr (fun e1 _ e2 -> OpE(Geq, e1, e2)))
+<|> (liftA3 ar_expr (symbol @@ Op Eq)  comp_expr (fun e1 _ e2 -> OpE(Eq,  e1, e2)))
+<|> (liftA3 ar_expr (symbol @@ Op Neq) comp_expr (fun e1 _ e2 -> OpE(Neq, e1, e2)))
+<|> ar_expr
+    ) ts
 
 and ar_expr ts =
     ((term ++ ar_expr_prime) >> (fun (e, k) -> k e)) ts
