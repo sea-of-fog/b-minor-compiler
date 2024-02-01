@@ -1,0 +1,5 @@
+let x:bool = true;
+while(x){
+    print x;
+    x = false;
+    }
