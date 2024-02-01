@@ -77,7 +77,7 @@ type ('a, 'b) ann_stmt =
     | ExprAS  of 'b ann_expr 
     | BlockAS of 'a * (('a, 'b) ann_stmt) list
     | IfAS    of 'b ann_expr * ('a, 'b) ann_stmt
-    | WhileAS of expr * stmt
+    | WhileAS of 'b ann_expr * ('a, 'b) ann_stmt
 
 type ('a, 'b) ann_prog =
     ('a, 'b) ann_stmt list
