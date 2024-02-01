@@ -93,8 +93,7 @@ and comp_expr ts =
 <|> (liftA3 ar_expr (symbol @@ Op Geq) comp_expr (fun e1 _ e2 -> OpE(Geq, e1, e2)))
 <|> (liftA3 ar_expr (symbol @@ Op Eq)  comp_expr (fun e1 _ e2 -> OpE(Eq,  e1, e2)))
 <|> (liftA3 ar_expr (symbol @@ Op Neq) comp_expr (fun e1 _ e2 -> OpE(Neq, e1, e2)))
-<|> ar_expr
-    ) ts
+<|> ar_expr) ts
 
 and ar_expr ts =
     ((term ++ ar_expr_prime) >> (fun (e, k) -> k e)) ts
