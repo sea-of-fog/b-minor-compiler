@@ -16,6 +16,8 @@ let rec max_temps = function
     | BlockAS (bdata, stmts) ->
         max bdata.temp_vars_v2
             (List.fold_left max 0 (List.map max_temps stmts))
+    | IfAS (exp, stmt) ->
+            max_temps stmt
 
 let rec max_local = function
     | ExprAS _ ->
@@ -26,6 +28,8 @@ let rec max_local = function
         0
     | BlockAS (bdata, stmts) ->
         bdata.local_vars_v2 + (List.fold_left max 0 (List.map max_local stmts))
+    | IfAS (exp, stmt) ->
+            max_local stmt
 
 let comp_box = 
     ref 0
