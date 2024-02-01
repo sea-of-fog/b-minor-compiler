@@ -19,6 +19,7 @@ type keyword =
     | False
     | Int
     | Bool
+    | If
 
 type token =
     | Keyword of keyword
@@ -52,6 +53,7 @@ type stmt =
     | PrintS of expr
     | DeclS  of decl
     | ExprS  of expr 
+    | IfS    of stmt
     | BlockS of stmt list
 
 type prog = stmt list
@@ -72,6 +74,7 @@ type ('a, 'b) ann_stmt =
     | DeclAS  of 'b ann_decl
     | ExprAS  of 'b ann_expr 
     | BlockAS of 'a * (('a, 'b) ann_stmt) list
+    | IfAS    of ('a, 'b) ann_stmt
 
 type ('a, 'b) ann_prog =
     ('a, 'b) ann_stmt list
