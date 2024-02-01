@@ -26,18 +26,19 @@ Each code block allocates its own local variables on the stack. Therefore, the s
 11. [ ] Elif
 12. [ ] Uninitialised declarations
 13. [ ] Check for initialised declarations
-14. [ ] Loops
-15. [ ] Arrays
-16. [ ] Function primitives
-17. [ ] Function declarations
-18. [ ] Constant folding/propagation
-19. [ ] Refactor lexing
-20. [ ] Generate useful errors from initialization/declaration check
-21. [ ] Comments
-22. [ ] Change print statement to book version
-23. [ ] Unify interface for traversing AST with state; maybe Traversable from haskell?
-24. [ ] Improve error messeages from type checking
-25. [ ] Organize the project directory
+14. [ ] While loops
+15. [ ] For loops
+16. [ ] Arrays
+17. [ ] Function primitives
+18. [ ] Function declarations
+19. [ ] Constant folding/propagation
+20. [ ] Refactor lexing
+21. [ ] Generate useful errors from initialization/declaration check
+22. [ ] Comments
+23. [ ] Change print statement to book version
+24. [ ] Unify interface for traversing AST with state; maybe Traversable from haskell?
+25. [ ] Improve error messeages from type checking
+26. [ ] Organize the project directory
 
 ## Bugs and issues
 
