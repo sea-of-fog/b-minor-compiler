@@ -50,6 +50,7 @@ let id_lex str =
         | "int"    -> Some (Keyword Int, s)
         | "bool"   -> Some (Keyword Bool, s)
         | "if"     -> Some (Keyword If, s)
+        | "while"   -> Some (Keyword While, s)
         | id       -> Some (Id id, s)
         end
 
