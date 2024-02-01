@@ -49,26 +49,29 @@ Each code block allocates its own local variables on the stack. Therefore, the s
 4. [ ] Check all the partial matches
 5. [ ] Make the state of label generators internal
 6. [ ] Find out why parsing and lexing became so slow with the addition of comparison operators
+6. [ ] Figure out how to make boolean comparison work
 
 ## Done
-1. [X] Boolean operators in codegen
-2. [X] Add interfaces to modules
-3. [X] Typechecking/type inference
-4. [X] Print booleans
-5. [X] Parsing whitespace
-6. [X] Testing infrastructure
-7. [X] Fix bug in the compiler app
-8. [X] Add types to declarations
-9. [X] refactor parsing
-10. [X] Tool: stop build process on error
-11. [X] Grammar: make assingment an expression
-12. [X] Code blocks
-13. [X] Make typechecker monadic
-14. [X] Grammar: add annotations to AST
-15. [X] Division operator in codegen
-16. [X] Implement temporary variables (for arbitrary length expressions)
-17. [X] Comparison operators
-18. [X] If
+1. [X] Generate code for print
+2. [X] Booleans
+3. [X] Boolean operators in codegen
+4. [X] Add interfaces to modules
+5. [X] Typechecking/type inference
+6. [X] Print booleans
+7. [X] Parsing whitespace
+8. [X] Testing infrastructure
+9. [X] Fix bug in the compiler app
+10. [X] Add types to declarations
+11. [X] refactor parsing
+12. [X] Tool: stop build process on error
+13. [X] Grammar: make assingment an expression
+14. [X] Code blocks
+15. [X] Make typechecker monadic
+16. [X] Grammar: add annotations to AST
+17. [X] Division operator in codegen
+18. [X] Implement temporary variables (for arbitrary length expressions)
+19. [X] Comparison operators
+20. [X] If
 
 ## Optional features
 1. [ ] loop breaks
@@ -78,7 +81,3 @@ Each code block allocates its own local variables on the stack. Therefore, the s
 ## Things to test
 1. [X] Am I allocating registers correctly? Should they not be freed?
 2. [ ] Check all tests (esp. 27) to see if variables are allocated correctly on the stack
-
-## Done
-1. [X] Generate code for print
-2. [X] Booleans
