@@ -79,11 +79,17 @@ let operator_lex str =
          | "-" -> Some ((Op (Sub)), suffix str)
          | "*" -> Some ((Op (Mul)), suffix str)
          | "/" -> Some ((Op (Div)), suffix str)
+         | ">" -> Some ((Op (Gt)), suffix str)
+         | "<" -> Some ((Op (Lt)), suffix str)
          | _   -> if (String.length str < 2)
                   then None
                   else begin match (String.sub str 0 2) with
                        | "&&" -> Some ((Op And), suffix_from 2 str)
                        | "||" -> Some ((Op Or), suffix_from 2 str)
+                       | "!=" -> Some ((Op Neq), suffix_from 2 str)
+                       | "==" -> Some ((Op Eq), suffix_from 2 str)
+                       | "<=" -> Some ((Op Leq), suffix_from 2 str)
+                       | ">=" -> Some ((Op Geq), suffix_from 2 str)
                        | _    -> None
                        end
 
@@ -106,9 +112,9 @@ let rec lex_it str acc =
     then lex_it (suffix str) acc
     else      match id_lex str with
               | Some (token, rest) -> lex_it rest (token::acc)
-              | None -> match paren_lex str with
+              | None -> match operator_lex str with
                         | Some (token, rest) -> lex_it rest (token::acc) 
-                        | None -> match operator_lex str with
+                        | None -> match paren_lex str with
                                   | Some (token, rest) -> lex_it rest (token::acc)
                                   | None -> match number_lex str with
                                             | Some (token, rest) -> lex_it rest (token::acc)

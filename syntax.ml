@@ -5,6 +5,12 @@ type op =
     | Div
     | Or
     | And
+    | Eq
+    | Neq
+    | Lt
+    | Leq
+    | Gt
+    | Geq
 
 type keyword =
     | Let
