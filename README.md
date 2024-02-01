@@ -20,7 +20,6 @@ Each code block allocates its own local variables on the stack. Therefore, the s
 4. [ ] Postfix operators
 5. [ ] Add unit tests
 6. [ ] Boolean not operator
-7. [ ] Comparison operators
 8. [ ] Remove scoping opening/closing from typechecker
 9. [ ] Better assembly formatting
 10. [ ] If/else
@@ -36,8 +35,9 @@ Each code block allocates its own local variables on the stack. Therefore, the s
 20. [ ] Generate useful errors from initialization/declaration check
 21. [ ] Comments
 22. [ ] Change print statement to book version
-23. [ ] Unify interface for traversing ast with state; maybe Traversable from haskell?
+23. [ ] Unify interface for traversing AST with state; maybe Traversable from haskell?
 24. [ ] Improve error messeages from type checking
+25. [ ] Organize the project directory
 
 ## Bugs and issues
 
@@ -61,6 +61,7 @@ Each code block allocates its own local variables on the stack. Therefore, the s
 14. [X] Grammar: add annotations to AST
 15. [X] Division operator in codegen
 16. [X] Implement temporary variables (for arbitrary length expressions)
+17. [X] Comparison operators
 
 ## Optional features
 1. [ ] loop breaks
